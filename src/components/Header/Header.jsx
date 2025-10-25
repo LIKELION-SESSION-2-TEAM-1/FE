@@ -3,8 +3,8 @@ import React from "react";
 
 const Header = () => {
     return (
-        <div className='logo'>
-            
+        <div className={styles.header}>
+            <div className={styles.logo}>TokPlan</div>
         </div>
     )
 }

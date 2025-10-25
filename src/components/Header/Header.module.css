@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Rammetto+One&display=swap');
+
+.header {
+    position: relative;
+    width: 100%;
+    height: auto;
+    font-family: 'Rammetto One';
+    font-size: 30px;
+}
+
+.logo {
+    padding: 70px 0 0 33px;
+}
