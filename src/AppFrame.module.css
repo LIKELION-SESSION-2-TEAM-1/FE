@@ -47,3 +47,10 @@
     opacity: 0.45;
     mix-blend-mode: multiply;
 }
+
+.backgroundChat {
+    background-color: #F6F3EC;
+}
+
+.backgroundChat::before { background: none; }
+.backgroundChat::after  { background-image: none; opacity: 0; }

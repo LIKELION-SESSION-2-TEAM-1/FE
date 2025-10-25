@@ -2,32 +2,31 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 62px 21px 0 21px;
 }
 
-.arrow {
-    margin-left: 29px;
+.group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    padding: 0 0 0 70px;
 }
 
 .groupName {
     font-size: 20px;
-    font-weight: 500;
-    margin: 0;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    font-weight: 600;
 
 }
 
 .groupNum {
     font-size: 17px;
     color: #454545;
-    margin-left: 220px;
 }
 
-.search {
-    margin-right: 5px;
-}
-
-.menu {
-    margin-right: 21px;
+.group2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
 }
