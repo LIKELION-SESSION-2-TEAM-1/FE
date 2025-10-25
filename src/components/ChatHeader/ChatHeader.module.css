@@ -1,0 +1,33 @@
+.chatHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.arrow {
+    margin-left: 29px;
+}
+
+.groupName {
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+}
+
+.groupNum {
+    font-size: 17px;
+    color: #454545;
+    margin-left: 220px;
+}
+
+.search {
+    margin-right: 5px;
+}
+
+.menu {
+    margin-right: 21px;
+}
