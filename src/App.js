@@ -3,6 +3,7 @@ import frame from './AppFrame.module.css';
 import { Route, Routes } from 'react-router-dom';
 
 import Header from './components/Header/Header.jsx'
+import NavBar from './components/NavBar/NavBar.jsx'
 import Home from './pages/OnBoarding/Home/Home';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                     </Routes>
                 </div>
+                 <NavBar />
             </div>
         </div>
     );
