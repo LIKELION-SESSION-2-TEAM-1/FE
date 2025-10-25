@@ -2,6 +2,7 @@ import styles from './Home.module.css';
 import Header from '../../../components/Header/Header';
 import pic from "../../../assets/pic/pic1.png";
 import arrow from "../../../assets/pic/arrow.png";
+import { Link } from 'react-router-dom';
 
 const Home = () => {
     return (
@@ -13,10 +14,13 @@ const Home = () => {
                         <p className={styles.card__text2}>친구들을 초대해서 대화만으로 계획을 완성하세요.</p>
                     </div>
                     <img src={pic} className={styles.card__pic} />
+                    <Link to='/Chat'>
                     <div className={styles.card__button}>
+                        
                         <p className={styles.card__text3}>새로운 여행계획 시작하기</p>
                         <img src={arrow} className={styles.card__arrow}/>
                     </div>
+                    </Link>
                 </div>
             </div>
         </div>
