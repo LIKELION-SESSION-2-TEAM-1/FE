@@ -35,3 +35,27 @@
     width: 312px;
     height: 103px;
 }
+
+.card__button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 312px;
+    height: 47px;
+    position: relative;
+    background-color: #FF3C01 ;
+    border-radius: 30px;
+    margin-top: 12px;
+    margin-left: 21px;
+    cursor: pointer;
+}
+
+.card__text3 {
+    font-size: 15px;
+    color: #FFF7D7;
+    margin-left: 20px;
+}
+
+.card__arrow {
+    margin-right: 23px;
+}
