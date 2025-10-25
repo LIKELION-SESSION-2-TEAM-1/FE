@@ -36,6 +36,10 @@
     height: 103px;
 }
 
+.item {
+    text-decoration: none;
+}
+
 .card__button {
     display: flex;
     justify-content: space-between;

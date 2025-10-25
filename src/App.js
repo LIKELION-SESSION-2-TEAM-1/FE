@@ -16,7 +16,7 @@ function App() {
                     <Header />
                     <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/Chat" element={<Chatting />} />
+                        <Route path="/chat" element={<Chatting />} />
                     </Routes>
                 </div>
                  <NavBar />

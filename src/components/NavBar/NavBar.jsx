@@ -8,11 +8,14 @@ import profile from '../../assets/pic/home-profile.svg';
 
 const NavBar = () => {
     const { pathname } = useLocation();
-    const isHomeActive = pathname === "/";
+    const path = pathname.toLowerCase();
+
+    const isHomeActive = path === '/' || path === '/home';
+    const isChatActive = path.startsWith('/chat');
 
     return (
         <div className={styles.navbar}>
-        <div className={styles.wrapper}>
+        <div className={`${styles.wrapper} ${isHomeActive ? styles.wrapperHomePinned : ''}`}>
             <NavLink to="/" className={styles.item} aria-label="홈" end>
             <div className={`${styles.iconWrap} ${isHomeActive ? styles.iconWrapActive : ''}`}>
                 {isHomeActive ? (
@@ -26,7 +29,19 @@ const NavBar = () => {
             </div>
             </NavLink>
 
-            <img src={chat} alt="Chat" className={styles.icon} />
+            <NavLink to="/chat" className={styles.item} aria-label="채팅">
+            <div className={`${styles.iconWrap} ${isChatActive ? styles.iconWrapActive : ''}`}>
+                {isChatActive ? (
+                <div className={styles.activeBox}>
+                    <span className={styles.iconMask} style={{ '--icon-url': `url(${chat})` }} aria-hidden="true" />
+                    <span className={styles.activeLabel}>Chat</span>
+                </div>
+                ) : (
+                <img src={chat} alt="Chat" className={styles.icon} />
+                )}
+            </div>
+            </NavLink>
+
             <img src={schedule} alt="Schedule" className={styles.icon} />
             <img src={profile} alt="Profile" className={styles.icon} />
         </div>
