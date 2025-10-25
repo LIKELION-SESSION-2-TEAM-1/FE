@@ -7,8 +7,8 @@ import Home from './pages/OnBoarding/Home/Home';
 function App() {
     return (
         <>
+            <Header />
             <Routes>
-                <Route path="/" element={<Header />} />
                 <Route path="/" element={<Home />} />
             </Routes>
         </>
