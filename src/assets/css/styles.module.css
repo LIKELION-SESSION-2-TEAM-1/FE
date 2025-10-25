@@ -7,6 +7,17 @@
         'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', sans-serif;
     font-size: 10px;
-    line-height: 1.4;
+    line-height: 1.3;
     letter-spacing: -0.0625em;
+}
+
+:global(html) {
+    font-size: 10px;
+    line-height: 1.3;
+    letter-spacing: -0.0625em;
+}
+
+:global(body) {
+    line-height: inherit;
+    letter-spacing: inherit;
 }
