@@ -3,6 +3,8 @@ import Header from '../../../components/Header/Header';
 import pic from "../../../assets/pic/pic1.png";
 import arrow from "../../../assets/pic/arrow.svg";
 import { NavLink } from 'react-router-dom';
+import search from "../../../assets/pic/search.svg";
+import trip from "../../../assets/pic/trip.svg";
 
 const Home = () => {
     return (
@@ -14,13 +16,28 @@ const Home = () => {
                         <p className={styles.card__text2}>친구들을 초대해서 대화만으로 계획을 완성하세요.</p>
                     </div>
                     <img src={pic} className={styles.card__pic} />
+                    
                     <NavLink to='/chat' className={styles.item}>
                     <div className={styles.card__button}>
-                        
                         <p className={styles.card__text3}>새로운 여행계획 시작하기</p>
                         <img src={arrow} className={styles.card__arrow}/>
                     </div>
                     </NavLink>
+                    
+                    <div className={styles.searchBar}>
+                        <img src={search} className={styles.searchBar__icon}/>
+                        <input className={styles.searchBar__input} type="search" placeholder='여행지 검색하기' />
+                    </div>
+
+                    <div className={styles.cardsContainer}>
+                        <div className={styles.recco}>
+                            <p className={styles.recco__text}>맞춤<br/>여행지<br/>추천</p>
+                            <img src={trip} className={styles.recco__img}/>
+                        </div>
+                        <div className={styles.style}>
+                            <p className={styles.style__text}>여행 스타일<br/>설정하기</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

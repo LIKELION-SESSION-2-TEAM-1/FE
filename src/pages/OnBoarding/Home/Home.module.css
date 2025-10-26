@@ -64,3 +64,95 @@
 .card__arrow {
     margin-right: 23px;
 }
+
+.searchBar {
+    width: 350px;
+    height: 51px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #FFF7D7;
+    position: relative;
+    margin-top: 35px;
+    justify-content: flex-start;
+}
+
+.searchBar__input {
+    background-color: transparent;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    color: #6B5237;
+    width: 100%;
+    margin-right: 17px;
+}
+
+.searchBar__icon {
+    margin-left: 23px;
+    margin-right: 16px;
+    width: 18px;
+    height: 17px;
+}
+
+.searchBar__input:focus {
+    outline: none;
+}
+
+/* searchBar에서 엑스 색을 바꾸는 것임!!*/ 
+.searchBar input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: searchfield-cancel-button;
+    filter: grayscale(1) opacity(0.6);
+    cursor: pointer;
+}
+
+.cardsContainer {
+    display: flex;
+    gap: 10px;
+}
+
+.recco {
+    display: flex;
+    justify-content: space-between;
+    width: 175px;
+    height: 198px;
+    position: relative;
+    background-color:#007931 ;
+    border-radius: 30px;
+    margin-top: 17px;
+}
+
+.recco__text {
+    font-size: 30px;
+    color:#FFF7D7;
+    margin-top: 32px;
+    margin-left: 19px;
+    font-weight: 700;
+}
+
+.recco__img {
+    width: 90px;
+    height: 86px;
+    position: absolute;
+    bottom: 12px;
+    right: 7px;
+}
+
+.style {
+    width: 175px;
+    height: 97px;
+    background-color:#FF3C01;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 17px;
+    position: relative;
+}
+
+.style__text {
+    font-size: 25px;
+    font-weight: 700;
+    color: #EDFED8;
+    margin-top: 18px;
+    margin-left: 20px;
+}
