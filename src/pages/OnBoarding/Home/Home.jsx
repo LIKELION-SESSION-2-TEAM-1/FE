@@ -5,6 +5,7 @@ import arrow from "../../../assets/pic/arrow.svg";
 import { NavLink } from 'react-router-dom';
 import search from "../../../assets/pic/search.svg";
 import trip from "../../../assets/pic/trip.svg";
+import pic2 from "../../../assets/pic/pic2.png";
 
 const Home = () => {
     return (
@@ -37,6 +38,7 @@ const Home = () => {
                         <div className={styles.style}>
                             <p className={styles.style__text}>여행 스타일<br/>설정하기</p>
                         </div>
+                        <img src={pic2} className={styles.pic2}/>
                     </div>
                 </div>
             </div>
