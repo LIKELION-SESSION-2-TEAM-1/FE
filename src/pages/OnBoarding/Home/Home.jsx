@@ -35,10 +35,12 @@ const Home = () => {
                             <p className={styles.recco__text}>맞춤<br/>여행지<br/>추천</p>
                             <img src={trip} className={styles.recco__img}/>
                         </div>
-                        <div className={styles.style}>
-                            <p className={styles.style__text}>여행 스타일<br/>설정하기</p>
+                        <div className={styles.cards}>
+                            <div className={styles.style}>
+                                <p className={styles.style__text}>여행 스타일<br/>설정하기</p>
+                            </div>
+                            <img src={pic2} className={styles.pic2}/>
                         </div>
-                        <img src={pic2} className={styles.pic2}/>
                     </div>
                 </div>
             </div>
