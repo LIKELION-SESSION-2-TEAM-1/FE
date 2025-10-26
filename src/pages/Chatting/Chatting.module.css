@@ -1,0 +1,75 @@
+.message__wrapper {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 34px;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.composer {
+    box-sizing: border-box;
+    width: 353px;
+    height: 57px;
+    position: relative;
+    background: #ffffff;
+    border-radius: 50px;
+
+    padding: 18px 65px 10px 22px;
+    display: flex;
+    align-items: center;
+}
+
+.input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    font-family: 'Pretendard Variable';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.3;
+
+    resize: none;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+
+    padding: 0;
+}
+
+.input::-webkit-scrollbar { display: none; }
+.input::placeholder { color: #626262; }
+
+.sendBtn {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 41px;
+    height: 35px;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+    background: #FF3C01;
+    cursor: default;
+}
+
+.sendBtnActive {
+    cursor: pointer;
+}
+
+.sendIcon {
+    position: absolute;
+    width: 34px;
+    display: block;
+    top: 0px;
+    left: 6px;
+}
