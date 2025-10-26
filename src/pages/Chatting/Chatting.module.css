@@ -73,3 +73,65 @@
     top: 0px;
     left: 6px;
 }
+
+.listWrapper {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px 16px 120px;
+}
+
+.list {
+    box-sizing: border-box;
+    width: 100%;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.msgBox {
+    background: #ffffff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 12px 14px;
+    word-break: break-word;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.name {
+    font-weight: 600;
+    color: #333;
+}
+
+.time {
+    opacity: 0.8;
+}
+
+.text {
+    font-size: 15px;
+    line-height: 1.4;
+    color: #111;
+}
+
+.errorBanner {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 720px;
+    margin: 12px auto 0;
+    background: #ffe9e6;
+    color: #a52112;
+    border: 1px solid #ffbdb3;
+    border-radius: 10px;
+    padding: 10px 12px;
+}
