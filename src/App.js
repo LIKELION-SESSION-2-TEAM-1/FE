@@ -22,7 +22,7 @@ function App() {
                         <Route path="/chat" element={<Chatting />} />
                     </Routes>
                 </div>
-                {!isChat && <NavBar />}
+                <NavBar />
             </div>
         </div>
     );
