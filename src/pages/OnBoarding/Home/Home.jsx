@@ -1,5 +1,4 @@
 import styles from './Home.module.css';
-import Header from '../../../components/Header/Header';
 import pic from "../../../assets/pic/pic1.png";
 import arrow from "../../../assets/pic/arrow.svg";
 import { NavLink } from 'react-router-dom';
