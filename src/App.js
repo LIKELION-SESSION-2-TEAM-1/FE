@@ -9,7 +9,7 @@ import Chatting from './pages/Chatting/Chatting.jsx';
 
 function App() {
     const { pathname } = useLocation();
-    const isChat = pathname == '/chat';
+    const isChat = pathname === '/chat';
 
     return (
         <div className={frame.appShell}>
