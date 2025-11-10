@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 
 import home from '../../assets/pic/home-home.svg';
 import chat from '../../assets/pic/home-chat.svg';
-import trip from '../../assets/pic/home-schedule.svg';
+import schedule from '../../assets/pic/home-schedule.svg';
 import profile from '../../assets/pic/home-profile.svg';
 
 const MaskIcon = ({ src, alt, className }) => (
@@ -32,7 +32,7 @@ const NavBar = () => {
                 </NavLink>
                 <NavLink to="/trip" className={styles.link}>
                     <div className={styles.icon_box}>
-                        <MaskIcon src={trip} alt="Trip" />
+                        <MaskIcon src={schedule} alt="Trip" />
                         <span className={styles.icon_text}>Trip</span>
                     </div>
                 </NavLink>
