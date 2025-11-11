@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
 
 .navbar {
-    position: fixed;
+    position: absolute;
     width: 393px;
     left: 50%;
     bottom: 38px;

@@ -1,11 +1,11 @@
-import styles from './Chatting.module.css';
-import send from "../../assets/pic/send.svg";
+import styles from './ChatRoom.module.css';
+import send from "../../../assets/pic/send.svg";
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import WSClient from '../../websocket/WebSocket';
-import ChatHeader from '../../components/ChatHeader/ChatHeader';
+import WSClient from '../../../websocket/WebSocket';
+import ChatHeader from '../../../components/ChatHeader/ChatHeader';
 
-const Chatting = () => {
+const ChatRoom = () => {
     const [hasText, setHasText] = useState(false);
     const [text, setText] = useState("");
     const [messages, setMessages] = useState([]);
@@ -102,4 +102,4 @@ const Chatting = () => {
     );
 };
 
-export default Chatting;
+export default ChatRoom;

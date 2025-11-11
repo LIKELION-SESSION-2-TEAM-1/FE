@@ -5,7 +5,8 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import Header from './components/Header/Header.jsx'
 import NavBar from './components/NavBar/NavBar.jsx'
 import Home from './pages/OnBoarding/Home/Home';
-import Chatting from './pages/Chatting/Chatting.jsx';
+import ChatList from './pages/Chatting/ChatList/ChatList';
+import ChatRoom from './pages/Chatting/ChatRoom/ChatRoom';
 
 function App() {
     const { pathname } = useLocation();
@@ -19,7 +20,7 @@ function App() {
                     {!isChat && <Header />}
                     <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/chat" element={<Chatting />} />
+                        <Route path="/chat" element={<ChatList />} />
                     </Routes>
                 </div>
                 <NavBar />
