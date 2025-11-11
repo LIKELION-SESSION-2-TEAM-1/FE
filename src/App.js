@@ -6,7 +6,6 @@ import Header from './components/Header/Header.jsx'
 import NavBar from './components/NavBar/NavBar.jsx'
 import Home from './pages/OnBoarding/Home/Home';
 import ChatList from './pages/Chatting/ChatList/ChatList';
-import ChatRoom from './pages/Chatting/ChatRoom/ChatRoom';
 
 function App() {
     const { pathname } = useLocation();
