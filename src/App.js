@@ -6,23 +6,26 @@ import Header from './components/Header/Header.jsx'
 import NavBar from './components/NavBar/NavBar.jsx'
 import Home from './pages/OnBoarding/Home/Home';
 import ChatList from './pages/Chatting/ChatList/ChatList';
+import ChatRoom from './pages/Chatting/ChatRoom/ChatRoom';
 
 function App() {
     const { pathname } = useLocation();
-    const isChat = pathname === '/chat';
+    const hideHeader = pathname === '/chatlist' || pathname === '/chatroom'; //
+    const isChatRoom = pathname === '/chatroom';
 
     return (
         <div className={frame.appShell}>
             <div className={frame.device}>
-                <div className={`${frame.background} ${isChat ? frame.backgroundChat : ''}`} />
+                <div className={`${frame.background} ${isChatRoom ? frame.backgroundChat : ''}`} />
                 <div className={frame.scrollArea}>
-                    {!isChat && <Header />}
+                    {!hideHeader && <Header />}
                     <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/chat" element={<ChatList />} />
+                        <Route path="/chatlist" element={<ChatList />} />
+                        <Route path="/chatroom" element={<ChatRoom />} />
                     </Routes>
                 </div>
-                <NavBar />
+                {!isChatRoom && <NavBar />}
             </div>
         </div>
     );

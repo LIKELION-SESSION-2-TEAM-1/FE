@@ -78,3 +78,7 @@
 .icon_box.active .icon_text {
     color: #FFF7D7;
 }
+
+.wrapper.chatBackground {
+    background-color: #ffffff;
+}

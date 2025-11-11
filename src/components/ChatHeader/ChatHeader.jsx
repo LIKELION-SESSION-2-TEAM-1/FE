@@ -3,10 +3,10 @@ import arrow from "../../assets/pic/arrow2.svg";
 import search from "../../assets/pic/search.svg";
 import menu from "../../assets/pic/menu.svg";
 
-const ChatHeader = () => {
+const ChatHeader = ({ onBack }) => {
     return (
         <div className={styles.chatHeader}>
-                <img src={arrow} alt="뒤로가기" className={styles.arrow}/>
+                <img src={arrow} alt="뒤로가기" className={styles.arrow} onClick={onBack} />
                 <div className={styles.group}>
                     <span className={styles.groupName}>부산 여행</span>
                     <span className={styles.groupNum}>6</span>

@@ -2,10 +2,12 @@ import styles from './ChatRoom.module.css';
 import send from "../../../assets/pic/send.svg";
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import WSClient from '../../../websocket/WebSocket';
 import ChatHeader from '../../../components/ChatHeader/ChatHeader';
 
 const ChatRoom = () => {
+    const navigate = useNavigate();
     const [hasText, setHasText] = useState(false);
     const [text, setText] = useState("");
     const [messages, setMessages] = useState([]);
@@ -64,7 +66,7 @@ const ChatRoom = () => {
     return (
         <div className={styles.chat__wrapper}>
             <div className={styles.chat__container}>
-                <ChatHeader/>
+                <ChatHeader onBack={() => navigate('/chatlist')} />
 
                 {error && (
                     <div className={styles.errorBanner} role="alert">

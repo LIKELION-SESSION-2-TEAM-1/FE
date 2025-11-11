@@ -17,14 +17,14 @@ const NavBar = () => {
 
     return (
         <div className={styles.navbar}>
-            <div className={styles.wrapper}>
+            <div className={`${styles.wrapper} ${isChat ? styles.chatBackground : ''}`}>
                 <NavLink to="/" className={styles.link}>
                     <div className={`${styles.icon_box} ${isHome ? styles.active : ''}`}>
                         <MaskIcon src={home} alt="Home" />
                         <span className={styles.icon_text}>Home</span>
                     </div>
                 </NavLink>
-                <NavLink to="/chat" className={styles.link}>
+                <NavLink to="/chatlist" className={styles.link}>
                     <div className={`${styles.icon_box} ${isChat ? styles.active : ''}`}>
                         <MaskIcon src={chat} alt="Chat" />
                         <span className={styles.icon_text}>Chat</span>
