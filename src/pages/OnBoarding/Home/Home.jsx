@@ -5,6 +5,8 @@ import { NavLink } from 'react-router-dom';
 import search from "../../../assets/pic/search.svg";
 import trip from "../../../assets/pic/trip.svg";
 import pic2 from "../../../assets/pic/pic2.png";
+import pic3 from "../../../assets/pic/pic3.png";
+import arrow3 from "../../../assets/pic/arrow3.svg";
 
 const Home = () => {
     return (
@@ -40,6 +42,19 @@ const Home = () => {
                             </div>
                             <img src={pic2} alt="" className={styles.pic2}/>
                         </div>
+                    </div>
+
+                    <div className={styles.popular}>
+                        <img src={pic3} className={styles.pic3}/>
+                        <p className={styles.popular__text}>이번주 인기 여행지</p>
+                        <div className={styles.popular__button}>
+                            <img src={arrow3} alt="" className={styles.popular__arrow}/>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p className={styles.copyright}>Copyright © 2025 tokplan<br/>
+                        All rights reserved.</p>
                     </div>
                 </div>
             </div>
