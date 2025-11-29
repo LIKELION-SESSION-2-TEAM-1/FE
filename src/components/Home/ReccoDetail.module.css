@@ -1,0 +1,65 @@
+.reccoDetail {
+    width: 359px;
+    height: 443px;
+    background-color:#007931;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 17px;
+    position: relative; 
+}
+
+.arrow {
+    width: 20px;
+    height: 25px;
+    margin-left: 167px;
+    margin-top: 16.5px;
+    margin-bottom: 16.5px;
+}
+.text1 {
+    font-size: 25px;
+    margin-left: 27px;
+    color:#FFF7D7;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.text2 {
+    font-size: 42px;
+    margin-left: 27px;
+    margin-top: ;
+    color:#FFF7D7;
+    font-weight: 700;
+    line-height: 0.97;
+}
+
+.box {
+    display: flex;
+    align-items: center; 
+    gap: 9px;
+    margin-top: 18px;
+}
+
+.pic4 {
+    margin-left: 20px;
+}
+
+.top {
+    width: 78px;
+    height: 119px;
+    background-color: #FFF7D7;
+    border-radius: 20px;
+    color:#005020;
+    font-size: 47px;
+    font-weight: 600;
+    line-height: 0.97;
+    display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pic5 {
+    margin-left: 20px;
+    margin-right:9px;
+    margin-top: 6px;
+}

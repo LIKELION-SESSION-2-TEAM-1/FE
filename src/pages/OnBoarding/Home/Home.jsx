@@ -7,8 +7,21 @@ import trip from "../../../assets/pic/trip.svg";
 import pic2 from "../../../assets/pic/pic2.png";
 import pic3 from "../../../assets/pic/pic3.png";
 import arrow3 from "../../../assets/pic/arrow3.svg";
+import React,{ useState } from 'react';
+import ReccoDetail from "../../../components/Home/ReccoDetail";
 
 const Home = () => {
+
+    const [isReccoExpanded, setIsReccoExpanded] = useState(false);
+
+    const handleReccoToggle = () => {
+        setIsReccoExpanded(prev => !prev);
+    };
+
+    const handleDetailClose = () => {
+        setIsReccoExpanded(false);
+    };
+    
     return (
         <div className={styles.main__wrapper}>
             <div className={styles.main__container}>
@@ -31,11 +44,15 @@ const Home = () => {
                         <input className={styles.searchBar__input} type="search" placeholder='여행지 검색하기' />
                     </div>
 
-                    <div className={styles.cardsContainer}>
-                        <div className={styles.recco}>
+                    {isReccoExpanded ? (
+                        <ReccoDetail className={styles.detailClass} onClose={handleDetailClose}/>
+                    ) : (
+                        <div className={styles.cardsContainer}>
+                        <div className={styles.recco} onClick={handleReccoToggle}>
                             <p className={styles.recco__text}>맞춤<br/>여행지<br/>추천</p>
                             <img src={trip} alt="" className={styles.recco__img}/>
                         </div>
+                        
                         <div className={styles.cards}>
                             <div className={styles.style}>
                                 <p className={styles.style__text}>여행 스타일<br/>설정하기</p>
@@ -43,6 +60,8 @@ const Home = () => {
                             <img src={pic2} alt="" className={styles.pic2}/>
                         </div>
                     </div>
+                    )}
+                    
 
                     <div className={styles.popular}>
                         <img src={pic3} className={styles.pic3}/>
