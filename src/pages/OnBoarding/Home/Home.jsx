@@ -9,6 +9,7 @@ import pic3 from "../../../assets/pic/pic3.png";
 import arrow3 from "../../../assets/pic/arrow3.svg";
 import React,{ useState } from 'react';
 import ReccoDetail from "../../../components/Home/ReccoDetail";
+import PopularDetail from "../../../components/Home/PopularDetail";
 
 const Home = () => {
 
@@ -22,6 +23,16 @@ const Home = () => {
         setIsReccoExpanded(false);
     };
     
+    const [isPopularExpanded, setIsPopularExpanded] = useState(false);
+
+    const handlePopularToggle = () => {
+        setIsPopularExpanded(prev => !prev);
+    };
+
+    const handlePopularClose = () => {
+        setIsPopularExpanded(false);
+    }
+
     return (
         <div className={styles.main__wrapper}>
             <div className={styles.main__container}>
@@ -62,14 +73,17 @@ const Home = () => {
                     </div>
                     )}
                     
-
-                    <div className={styles.popular}>
-                        <img src={pic3} className={styles.pic3}/>
-                        <p className={styles.popular__text}>이번주 인기 여행지</p>
-                        <div className={styles.popular__button}>
-                            <img src={arrow3} alt="" className={styles.popular__arrow}/>
+                    {isPopularExpanded ? (
+                        <PopularDetail onClose={handlePopularClose}/>
+                    ) : (
+                        <div className={styles.popular}>
+                            <img src={pic3} className={styles.pic3}/>
+                            <p className={styles.popular__text}>이번주 인기 여행지</p>
+                            <div className={styles.popular__button} onClick={handlePopularToggle}>
+                                <img src={arrow3} alt="" className={styles.popular__arrow}/>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     <div>
                         <p className={styles.copyright}>Copyright © 2025 tokplan<br/>

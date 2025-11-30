@@ -27,7 +27,6 @@
 .text2 {
     font-size: 42px;
     margin-left: 27px;
-    margin-top: ;
     color:#FFF7D7;
     font-weight: 700;
     line-height: 0.97;
@@ -54,8 +53,8 @@
     font-weight: 600;
     line-height: 0.97;
     display: flex;
-  justify-content: center;
-  align-items: center;
+    justify-content: center;
+    align-items: center;
 }
 
 .pic5 {
