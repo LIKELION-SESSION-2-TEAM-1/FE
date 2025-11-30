@@ -3,13 +3,6 @@
     flex-direction: column;
     align-items: center;
     min-height: 100vh; 
-    overflow-y: auto;
-    -ms-overflow-style: none;
-}
-
-.main__container::-webkit-scrollbar {
-    width: 0; 
-    height: 0;
 }
 
 .main__card {

@@ -12,33 +12,136 @@ const ChatRoom = () => {
     const [text, setText] = useState("");
     const [messages, setMessages] = useState([]);
     const [error, setError] = useState("");
+    const [loadingHistory, setLoadingHistory] = useState(true);
+    const [activeRoom, setActiveRoom] = useState(null);
+    const pollingRef = useRef(null);
 
     const listRef = useRef(null);
     const inputRef = useRef(null);
 
-    const ws = useMemo(() => new WSClient(undefined, { reconnect: false }), []);
+    const ws = useMemo(() => new WSClient(undefined, { reconnect: true }), []);
+
+    const scrollToBottom = () => {
+        requestAnimationFrame(() => {
+            const el = listRef.current;
+            if (el) el.scrollTop = el.scrollHeight;
+        });
+    };
+
+    const mergeMessages = (nextList) => {
+        const keyOf = (m) =>
+            m?.clientTempId ||
+            m?.id ||
+            `${m.chatRoomId ?? ""}-${m.senderName ?? ""}-${m.messageType ?? ""}-${m.message ?? ""}`;
+
+        setMessages((prev) => {
+            const map = new Map();
+            [...prev, ...(nextList || [])].forEach((m) => {
+                const key = keyOf(m);
+                if (!map.has(key)) {
+                    map.set(key, m);
+                } else {
+                    // 서버 응답(아이디/타임스탬프 포함)을 우선 저장
+                    const existing = map.get(key);
+                    if (m?.id && !existing?.id) {
+                        map.set(key, m);
+                    } else if (m?.ts && !existing?.ts) {
+                        map.set(key, m);
+                    }
+                }
+            });
+            return Array.from(map.values());
+        });
+    };
 
     useEffect(() => {
-        ws.on("open", () => setError(""));
-        ws.on("message", (msg) => {
+        let cancelled = false;
+
+        const bootstrap = async () => {
+            try {
+                const rooms = await WSClient.fetchRooms();
+                let room = Array.isArray(rooms) && rooms.length ? rooms[0] : null;
+                if (!room) {
+                    room = await WSClient.createRoom({ name: "새 채팅방" });
+                }
+                if (cancelled) return;
+                setActiveRoom(room);
+
+                const roomId = room?.roomId ?? room?.id ?? 0;
+                const data = await WSClient.fetchChats(roomId);
+                if (cancelled) return;
+                const arr = Array.isArray(data) ? data.slice() : [];
+                setMessages(arr);
+                scrollToBottom();
+            } catch {
+                // 조용히 진행
+            } finally {
+                if (!cancelled) setLoadingHistory(false);
+            }
+        };
+
+        bootstrap();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        const offOpen = ws.on("open", () => {
+            scrollToBottom();
+        });
+        const offMsg = ws.on("message", (msg) => {
             const asObj = typeof msg === "string" ? { raw: msg } : msg;
+            const roomId = activeRoom?.roomId ?? activeRoom?.id ?? null;
+            if (roomId !== null && asObj?.chatRoomId !== undefined && asObj.chatRoomId !== roomId) {
+                return;
+            }
             if (asObj?.messageType === "TALK" || asObj?.message) {
-                setMessages((prev) => [asObj, ...prev]);
+                mergeMessages([asObj]);
             }
         });
-        ws.on("error", (err) => {
-            setError(err?.message || "웹소켓 통신 오류가 발생했습니다.");
-        });
-        ws.on("close", () => {
-            setError("서버와의 연결이 종료되었습니다.");
-        });
+        const offErr = ws.on("error", () => {});
+        const offClose = ws.on("close", () => {});
 
         ws.connect();
 
         return () => {
+            offOpen();
+            offMsg();
+            offErr();
+            offClose();
             ws.close();
         };
-    }, [ws]);
+    }, [ws, activeRoom]);
+
+    useEffect(() => {
+        if (!activeRoom) return;
+        if (pollingRef.current) clearInterval(pollingRef.current);
+
+        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
+        const poll = async () => {
+            try {
+                const data = await WSClient.fetchChats(roomId);
+                if (Array.isArray(data)) {
+                    mergeMessages(data);
+                }
+            } catch {
+                // silent
+            }
+        };
+
+        poll(); // initial
+        pollingRef.current = setInterval(poll, 3000);
+
+        return () => {
+            if (pollingRef.current) clearInterval(pollingRef.current);
+        };
+    }, [activeRoom]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     const handleInput = (e) => {
         const v = e.target.value;
@@ -49,18 +152,22 @@ const ChatRoom = () => {
     const handleSend = () => {
         const trimmed = text.trim();
         if (!trimmed) return;
+        if (!activeRoom) return;
 
-        const talk = WSClient.buildTalkMessage({ text: trimmed, senderName: "tester" });
+        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
+        const clientTempId = `temp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        const talk = {
+            ...WSClient.buildTalkMessage({ text: trimmed, senderName: "tester", chatRoomId: roomId }),
+            clientTempId,
+        };
 
-        try {
-            ws.send(talk);
-            setMessages((prev) => [talk, ...prev]);
-            setText("");
-            setHasText(false);
-            inputRef.current?.focus();
-        } catch (e) {
-            setError(e?.message || "메시지 전송에 실패했습니다.");
-        }
+        setText("");
+        setHasText(false);
+        inputRef.current?.focus();
+
+        // WS 전송 시도 및 낙관적 UI 업데이트
+        mergeMessages([talk]);
+        ws.send(talk);
     };
         
     return (
@@ -68,10 +175,8 @@ const ChatRoom = () => {
             <div className={styles.chat__container}>
                 <ChatHeader onBack={() => navigate('/chatlist')} />
 
-                {error && (
-                    <div className={styles.errorBanner} role="alert">
-                        {error}
-                    </div>
+                {loadingHistory && (
+                    <div className={styles.loading}>채팅 내역을 불러오는 중...</div>
                 )}
 
                 <div className={styles.listWrapper}>
