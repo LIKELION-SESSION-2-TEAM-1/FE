@@ -157,7 +157,7 @@ const ChatRoom = () => {
         const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
         const clientTempId = `temp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
         const talk = {
-            ...WSClient.buildTalkMessage({ text: trimmed, senderName: "tester", chatRoomId: roomId }),
+            ...WSClient.buildTalkMessage({ text: trimmed, senderName: "뿡뻉", chatRoomId: roomId }),
             clientTempId,
         };
 
