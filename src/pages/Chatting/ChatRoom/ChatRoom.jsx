@@ -1,209 +1,238 @@
 import styles from './ChatRoom.module.css';
-import send from "../../../assets/pic/send.svg";
-
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import WSClient from '../../../websocket/WebSocket';
-import ChatHeader from '../../../components/ChatHeader/ChatHeader';
+import WSClient from '../../../websocket/WebSocket'; 
+import sendIcon from "../../../assets/pic/send.svg";
+import searchIcon from "../../../assets/pic/search.svg";
+import menuIcon from "../../../assets/pic/menu.svg";
+import backIcon from "../../../assets/pic/arrow2.svg";
+import pic2 from "../../../assets/pic/pic2.png";
 
 const ChatRoom = () => {
     const navigate = useNavigate();
-    const [hasText, setHasText] = useState(false);
-    const [text, setText] = useState("");
     const [messages, setMessages] = useState([]);
-    const [error, setError] = useState("");
-    const [loadingHistory, setLoadingHistory] = useState(true);
+    const [text, setText] = useState("");
     const [activeRoom, setActiveRoom] = useState(null);
-    const pollingRef = useRef(null);
-
+    const [isLoading, setIsLoading] = useState(true);
     const listRef = useRef(null);
-    const inputRef = useRef(null);
+    
+    // 내 정보 관리
+    const [me] = useState(() => {
+        const savedId = sessionStorage.getItem("chat_userId");
+        const savedName = sessionStorage.getItem("chat_userName");
 
-    const ws = useMemo(() => new WSClient(undefined, { reconnect: true }), []);
+        if (savedId && savedName) {
+            return { userId: parseInt(savedId), userName: savedName };
+        }
+        
+        const newId = Math.floor(Math.random() * 100000); 
+        const newName = `User_${newId}`;
+        
+        sessionStorage.setItem("chat_userId", newId);
+        sessionStorage.setItem("chat_userName", newName);
+        
+        return { userId: newId, userName: newName };
+    });
+
+    const ws = useMemo(() => new WSClient({ reconnectDelay: 4000 }), []);
+
+    // 내 프로필 색상 (고정)
+    const myGradient = "linear-gradient(135deg, #ffd77a, #ff9a3c)";
+
+    // [수정] chat.html 스타일의 랜덤 색상 생성기
+    // 유저의 ID나 이름을 기반으로 고유한 HEX 색상을 생성합니다.
+    // 이렇게 하면 유저마다 색상이 고정되면서도(구분 가능), 서로 다른 색상을 가질 확률이 매우 높아집니다.
+    const getUserColor = (id, name) => {
+        const key = id ? String(id) : name;
+        if (!key) return "#ddd";
+        
+        let hash = 0;
+        for (let i = 0; i < key.length; i++) {
+            hash = key.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        
+        // 16진수 색상 코드로 변환 (ex: #A1F2C3)
+        let color = '#';
+        for (let i = 0; i < 3; i++) {
+            const value = (hash >> (i * 8)) & 0xFF;
+            color += ('00' + value.toString(16)).substr(-2);
+        }
+        return color;
+    };
 
     const scrollToBottom = () => {
         requestAnimationFrame(() => {
-            const el = listRef.current;
-            if (el) el.scrollTop = el.scrollHeight;
-        });
-    };
-
-    const mergeMessages = (nextList) => {
-        const keyOf = (m) =>
-            m?.clientTempId ||
-            m?.id ||
-            `${m.chatRoomId ?? ""}-${m.senderName ?? ""}-${m.messageType ?? ""}-${m.message ?? ""}`;
-
-        setMessages((prev) => {
-            const map = new Map();
-            [...prev, ...(nextList || [])].forEach((m) => {
-                const key = keyOf(m);
-                if (!map.has(key)) {
-                    map.set(key, m);
-                } else {
-                    // 서버 응답(아이디/타임스탬프 포함)을 우선 저장
-                    const existing = map.get(key);
-                    if (m?.id && !existing?.id) {
-                        map.set(key, m);
-                    } else if (m?.ts && !existing?.ts) {
-                        map.set(key, m);
-                    }
-                }
-            });
-            return Array.from(map.values());
+            if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
         });
     };
 
     useEffect(() => {
-        let cancelled = false;
-
-        const bootstrap = async () => {
+        const init = async () => {
             try {
                 const rooms = await WSClient.fetchRooms();
                 let room = Array.isArray(rooms) && rooms.length ? rooms[0] : null;
-                if (!room) {
-                    room = await WSClient.createRoom({ name: "새 채팅방" });
-                }
-                if (cancelled) return;
+                if (!room) room = await WSClient.createRoom("부산 여행");
                 setActiveRoom(room);
 
-                const roomId = room?.roomId ?? room?.id ?? 0;
-                const data = await WSClient.fetchChats(roomId);
-                if (cancelled) return;
-                const arr = Array.isArray(data) ? data.slice() : [];
-                setMessages(arr);
-                scrollToBottom();
-            } catch {
-                // 조용히 진행
-            } finally {
-                if (!cancelled) setLoadingHistory(false);
-            }
-        };
-
-        bootstrap();
-
-        return () => {
-            cancelled = true;
-        };
-    }, []);
-
-    useEffect(() => {
-        const offOpen = ws.on("open", () => {
-            scrollToBottom();
-        });
-        const offMsg = ws.on("message", (msg) => {
-            const asObj = typeof msg === "string" ? { raw: msg } : msg;
-            const roomId = activeRoom?.roomId ?? activeRoom?.id ?? null;
-            if (roomId !== null && asObj?.chatRoomId !== undefined && asObj.chatRoomId !== roomId) {
-                return;
-            }
-            if (asObj?.messageType === "TALK" || asObj?.message) {
-                mergeMessages([asObj]);
-            }
-        });
-        const offErr = ws.on("error", () => {});
-        const offClose = ws.on("close", () => {});
-
-        ws.connect();
-
-        return () => {
-            offOpen();
-            offMsg();
-            offErr();
-            offClose();
-            ws.close();
-        };
-    }, [ws, activeRoom]);
-
-    useEffect(() => {
-        if (!activeRoom) return;
-        if (pollingRef.current) clearInterval(pollingRef.current);
-
-        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
-        const poll = async () => {
-            try {
-                const data = await WSClient.fetchChats(roomId);
-                if (Array.isArray(data)) {
-                    mergeMessages(data);
+                const roomId = room?.roomId ?? room?.id ?? 1;
+                
+                const history = await WSClient.fetchChats(roomId);
+                if (Array.isArray(history) && history.length) {
+                    setMessages(history);
                 }
-            } catch {
-                // silent
+
+                ws.roomId = roomId;
+                ws.connect({
+                    onMessage: (msg) => handleReceive(msg, roomId),
+                });
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setIsLoading(false);
+                scrollToBottom();
             }
         };
-
-        poll(); // initial
-        pollingRef.current = setInterval(poll, 3000);
-
-        return () => {
-            if (pollingRef.current) clearInterval(pollingRef.current);
-        };
-    }, [activeRoom]);
+        init();
+        return () => ws.disconnect();
+    }, [ws]);
 
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
 
-    const handleInput = (e) => {
-        const v = e.target.value;
-        setText(v);
-        setHasText(v.trim().length > 0);
+    const keyOf = (m) =>
+        m?.id ||
+        m?.clientTempId ||
+        `${m?.chatRoomId}-${m?.senderUserId}-${m?.ts}`;
+
+    const handleReceive = (msg, roomId) => {
+        if (msg.chatRoomId && msg.chatRoomId !== roomId) return;
+        setMessages((prev) => {
+            const exists = prev.some((m) => keyOf(m) === keyOf(msg));
+            return exists ? prev : [...prev, msg];
+        });
     };
 
     const handleSend = () => {
-        const trimmed = text.trim();
-        if (!trimmed) return;
-        if (!activeRoom) return;
-
-        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
-        const clientTempId = `temp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-        const talk = {
-            ...WSClient.buildTalkMessage({ text: trimmed, senderName: "뿡뻉", chatRoomId: roomId }),
-            clientTempId,
-        };
-
-        setText("");
-        setHasText(false);
-        inputRef.current?.focus();
-
-        // WS 전송 시도 및 낙관적 UI 업데이트
-        mergeMessages([talk]);
-        ws.send(talk);
-    };
+        if (!text.trim() || !activeRoom) return;
+        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 1;
         
+        let payload = WSClient.buildTalkMessage({
+            text,
+            senderName: me.userName,
+            chatRoomId: roomId,
+        });
+        payload.senderUserId = me.userId; 
+
+        ws.send(payload);
+        setText("");
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.isComposing || e.nativeEvent.isComposing) return;
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    };
+
+    if (isLoading) return <div className={styles.loadingScreen}>채팅방에 입장 중입니다...</div>;
+
     return (
-        <div className={styles.chat__wrapper}>
-            <div className={styles.chat__container}>
-                <ChatHeader onBack={() => navigate('/chatlist')} />
+        <div className={styles.screen}>
+            <div className={styles.topBarWrapper}>
+                <header className={styles.topBar}>
+                    <button className={styles.navBtn} onClick={() => navigate(-1)} aria-label="back">
+                        <img src={backIcon} alt="back" />
+                    </button>
+                    <div className={styles.titleGroup}>
+                        <h1 className={styles.title}>부산 여행</h1>
+                        <span className={styles.memberCount}>6</span>
+                    </div>
+                    <div className={styles.topIcons}>
+                        <img className={styles.iconImg} src={searchIcon} alt="search" />
+                        <img className={styles.iconImg} src={menuIcon} alt="menu" />
+                    </div>
+                </header>
+            </div>
 
-                {loadingHistory && (
-                    <div className={styles.loading}>채팅 내역을 불러오는 중...</div>
-                )}
+            <div className={styles.messageList} ref={listRef}>
+                {messages.map((m) => {
+                    // 본인 판별
+                    const isMe = (m.senderUserId === me.userId) || (!m.senderUserId && m.senderName === me.userName);
+                    
+                    const avatarImg = m.senderName === "민수" ? pic2 : null;
+                    
+                    // [수정] 이제 팔레트 인덱스가 아닌 Hex Color를 직접 할당합니다.
+                    const avatarStyle = isMe 
+                        ? { background: myGradient } 
+                        : { background: getUserColor(m.senderUserId, m.senderName) };
 
-                <div className={styles.listWrapper}>
-                    <div className={styles.list} ref={listRef} aria-live="polite">
-                        {messages.map((m, idx) => (
-                        <div key={m.ts ? `${m.ts}-${idx}` : idx} className={styles.msgBox}>
-                            <div className={styles.meta}>
-                                <span className={styles.name}>{m.senderName ?? 'unknown'}</span>
-                                <span className={styles.time}>
-                                    {m.ts ? new Date(m.ts).toLocaleString() : ''}
-                                </span>
-                            </div>
-                            <div className={styles.text}>{m.message ?? m.raw ?? ''}</div>
+                    return (
+                        <div
+                            key={keyOf(m)}
+                            className={`${styles.messageRow} ${isMe ? styles.myRow : styles.otherRow}`}
+                        >
+                            {!isMe && (
+                                <>
+                                    {avatarImg ? (
+                                        <img className={styles.avatar} src={avatarImg} alt={m.senderName} />
+                                    ) : (
+                                        <div 
+                                            className={styles.unknownAvatar} 
+                                            style={avatarStyle} 
+                                            aria-label={m.senderName} 
+                                        />
+                                    )}
+                                    <div className={styles.bubbleWrap}>
+                                        <div className={styles.senderName}>{m.senderName}</div>
+                                        <div className={`${styles.bubble} ${styles.otherBubble}`}>
+                                            {m.message}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {isMe && (
+                                <>
+                                    <div className={styles.bubbleWrap}>
+                                        <div 
+                                            className={styles.senderName} 
+                                            style={{ textAlign: 'right', marginRight: '4px' }}
+                                        >
+                                            me
+                                        </div>
+                                        <div className={`${styles.bubble} ${styles.myBubble}`}>
+                                            {m.message}
+                                        </div>
+                                    </div>
+                                    {avatarImg ? (
+                                        <img className={styles.avatar} src={avatarImg} alt={m.senderName} />
+                                    ) : (
+                                        <div 
+                                            className={styles.unknownAvatar} 
+                                            style={avatarStyle} 
+                                            aria-label="me" 
+                                        />
+                                    )}
+                                </>
+                            )}
                         </div>
-                        ))}
-                    </div>
-                </div>
+                    );
+                })}
+            </div>
 
-                <div className={styles.message__wrapper}>
-                    <div className={styles.composer}>
-                        <textarea ref={inputRef} className={styles.input} placeholder="메세지를 입력하세요" rows={1} aria-label="메세지 입력" value={text} onInput={handleInput} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }} />
-                        <button type="button" className={`${styles.sendBtn} ${hasText ? styles.sendBtnActive : ''}`} aria-label="메세지 전송" onClick={handleSend} disabled={!hasText} title={!hasText ? "메시지를 입력하세요" : "전송"}>
-                            <img src={send} alt="" className={styles.sendIcon} />
-                        </button>
-                    </div>
-                </div>
-
+            <div className={styles.inputBar}>
+                <input
+                    className={styles.input}
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="메세지를 입력하세요"
+                />
+                <button className={styles.sendBtn} onClick={handleSend} disabled={!text.trim()} aria-label="send">
+                    <img src={sendIcon} alt="" />
+                </button>
             </div>
         </div>
     );
