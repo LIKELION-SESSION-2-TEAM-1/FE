@@ -2,6 +2,7 @@ import styles from './ChatRoom.module.css';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WSClient from '../../../websocket/WebSocket'; 
+import { fetchAiKeywords } from '../../../apis/aiApi';
 import sendIcon from "../../../assets/pic/send.svg";
 import searchIcon from "../../../assets/pic/search.svg";
 import menuIcon from "../../../assets/pic/menu.svg";
@@ -14,7 +15,14 @@ const ChatRoom = () => {
     const [text, setText] = useState("");
     const [activeRoom, setActiveRoom] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const listRef = useRef(null);
+    const [aiKeywords, setAiKeywords] = useState([]);
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiError, setAiError] = useState(null);
+    const [aiInsertIndex, setAiInsertIndex] = useState(null);
+    
+    // [수정] 스크롤 제어를 위한 Ref 추가
+    const messagesEndRef = useRef(null);
+    const messagesRef = useRef([]);
     
     // 내 정보 관리
     const [me] = useState(() => {
@@ -39,9 +47,6 @@ const ChatRoom = () => {
     // 내 프로필 색상 (고정)
     const myGradient = "linear-gradient(135deg, #ffd77a, #ff9a3c)";
 
-    // [수정] chat.html 스타일의 랜덤 색상 생성기
-    // 유저의 ID나 이름을 기반으로 고유한 HEX 색상을 생성합니다.
-    // 이렇게 하면 유저마다 색상이 고정되면서도(구분 가능), 서로 다른 색상을 가질 확률이 매우 높아집니다.
     const getUserColor = (id, name) => {
         const key = id ? String(id) : name;
         if (!key) return "#ddd";
@@ -51,7 +56,6 @@ const ChatRoom = () => {
             hash = key.charCodeAt(i) + ((hash << 5) - hash);
         }
         
-        // 16진수 색상 코드로 변환 (ex: #A1F2C3)
         let color = '#';
         for (let i = 0; i < 3; i++) {
             const value = (hash >> (i * 8)) & 0xFF;
@@ -60,11 +64,20 @@ const ChatRoom = () => {
         return color;
     };
 
-    const scrollToBottom = () => {
-        requestAnimationFrame(() => {
-            if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
-        });
-    };
+    // [수정] 메시지가 업데이트될 때마다 자동으로 스크롤 하단 이동
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+    useEffect(() => {
+        messagesRef.current = messages;
+    }, [messages]);
+
+    useEffect(() => {
+        if (aiKeywords.length > 0) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [aiKeywords]);
 
     useEffect(() => {
         const init = async () => {
@@ -89,16 +102,11 @@ const ChatRoom = () => {
                 console.error(e);
             } finally {
                 setIsLoading(false);
-                scrollToBottom();
             }
         };
         init();
         return () => ws.disconnect();
     }, [ws]);
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
 
     const keyOf = (m) =>
         m?.id ||
@@ -128,6 +136,26 @@ const ChatRoom = () => {
         setText("");
     };
 
+    const handleAiAnalyze = async () => {
+        if (aiLoading || !activeRoom) return;
+        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 1;
+        try {
+            setAiLoading(true);
+            setAiError(null);
+
+            const result = await fetchAiKeywords(roomId);
+            const keywords = Array.isArray(result?.keywords) ? result.keywords : [];
+
+            setAiKeywords(keywords);
+            setAiInsertIndex(keywords.length ? messagesRef.current.length : null);
+        } catch (e) {
+            console.error(e);
+            setAiError("AI 분석에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        } finally {
+            setAiLoading(false);
+        }
+    };
+
     const handleKeyDown = (e) => {
         if (e.isComposing || e.nativeEvent.isComposing) return;
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -137,6 +165,21 @@ const ChatRoom = () => {
     };
 
     if (isLoading) return <div className={styles.loadingScreen}>채팅방에 입장 중입니다...</div>;
+
+    const renderAiBlock = () => (
+        <div className={styles.aiKeywordCard}>
+            <p className={styles.aiKeywordTitle}>
+                AI 분석을 통해 현재 채팅방의 여행 핵심 키워드를 정리해드려요!
+            </p>
+            <div className={styles.aiKeywordList}>
+                {aiKeywords.map((kw, idx) => (
+                    <span key={`${kw}-${idx}`} className={styles.aiKeywordChip}>{kw}</span>
+                ))}
+            </div>
+        </div>
+    );
+
+    const shouldRenderAi = aiKeywords.length > 0 && aiInsertIndex !== null;
 
     return (
         <div className={styles.screen}>
@@ -154,72 +197,84 @@ const ChatRoom = () => {
                         <img className={styles.iconImg} src={menuIcon} alt="menu" />
                     </div>
                 </header>
+                <div className={styles.aiToolbar}>
+                    <button
+                        className={styles.aiButton}
+                        onClick={handleAiAnalyze}
+                        disabled={aiLoading || !activeRoom}
+                    >
+                        {aiLoading ? "분석 중..." : "AI 키워드 분석"}
+                    </button>
+                    {aiError && <span className={styles.aiError}>{aiError}</span>}
+                </div>
             </div>
 
-            <div className={styles.messageList} ref={listRef}>
-                {messages.map((m) => {
-                    // 본인 판별
+            <div className={styles.messageList}>
+                {shouldRenderAi && aiInsertIndex === 0 && renderAiBlock()}
+                {messages.map((m, idx) => {
                     const isMe = (m.senderUserId === me.userId) || (!m.senderUserId && m.senderName === me.userName);
-                    
                     const avatarImg = m.senderName === "민수" ? pic2 : null;
-                    
-                    // [수정] 이제 팔레트 인덱스가 아닌 Hex Color를 직접 할당합니다.
                     const avatarStyle = isMe 
                         ? { background: myGradient } 
                         : { background: getUserColor(m.senderUserId, m.senderName) };
 
                     return (
-                        <div
-                            key={keyOf(m)}
-                            className={`${styles.messageRow} ${isMe ? styles.myRow : styles.otherRow}`}
-                        >
-                            {!isMe && (
-                                <>
-                                    {avatarImg ? (
-                                        <img className={styles.avatar} src={avatarImg} alt={m.senderName} />
-                                    ) : (
-                                        <div 
-                                            className={styles.unknownAvatar} 
-                                            style={avatarStyle} 
-                                            aria-label={m.senderName} 
-                                        />
-                                    )}
-                                    <div className={styles.bubbleWrap}>
-                                        <div className={styles.senderName}>{m.senderName}</div>
-                                        <div className={`${styles.bubble} ${styles.otherBubble}`}>
-                                            {m.message}
+                        <React.Fragment key={keyOf(m)}>
+                            <div
+                                className={`${styles.messageRow} ${isMe ? styles.myRow : styles.otherRow}`}
+                            >
+                                {!isMe && (
+                                    <>
+                                        {avatarImg ? (
+                                            <img className={styles.avatar} src={avatarImg} alt={m.senderName} />
+                                        ) : (
+                                            <div 
+                                                className={styles.unknownAvatar} 
+                                                style={avatarStyle} 
+                                                aria-label={m.senderName} 
+                                            />
+                                        )}
+                                        <div className={styles.bubbleWrap}>
+                                            <div className={styles.senderName}>{m.senderName}</div>
+                                            <div className={`${styles.bubble} ${styles.otherBubble}`}>
+                                                {m.message}
+                                            </div>
                                         </div>
-                                    </div>
-                                </>
-                            )}
+                                    </>
+                                )}
 
-                            {isMe && (
-                                <>
-                                    <div className={styles.bubbleWrap}>
-                                        <div 
-                                            className={styles.senderName} 
-                                            style={{ textAlign: 'right', marginRight: '4px' }}
-                                        >
-                                            me
+                                {isMe && (
+                                    <>
+                                        <div className={styles.bubbleWrap}>
+                                            <div 
+                                                className={styles.senderName} 
+                                                style={{ textAlign: 'right', marginRight: '4px' }}
+                                            >
+                                                me
+                                            </div>
+                                            <div className={`${styles.bubble} ${styles.myBubble}`}>
+                                                {m.message}
+                                            </div>
                                         </div>
-                                        <div className={`${styles.bubble} ${styles.myBubble}`}>
-                                            {m.message}
-                                        </div>
-                                    </div>
-                                    {avatarImg ? (
-                                        <img className={styles.avatar} src={avatarImg} alt={m.senderName} />
-                                    ) : (
-                                        <div 
-                                            className={styles.unknownAvatar} 
-                                            style={avatarStyle} 
-                                            aria-label="me" 
-                                        />
-                                    )}
-                                </>
-                            )}
-                        </div>
+                                        {avatarImg ? (
+                                            <img className={styles.avatar} src={avatarImg} alt={m.senderName} />
+                                        ) : (
+                                            <div 
+                                                className={styles.unknownAvatar} 
+                                                style={avatarStyle} 
+                                                aria-label="me" 
+                                            />
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                            {shouldRenderAi && aiInsertIndex === idx + 1 && renderAiBlock()}
+                        </React.Fragment>
                     );
                 })}
+                {shouldRenderAi && aiInsertIndex > messages.length && renderAiBlock()}
+                {/* [수정] 스크롤 자동 이동을 위한 보이지 않는 앵커(Anchor) */}
+                <div ref={messagesEndRef} />
             </div>
 
             <div className={styles.inputBar}>

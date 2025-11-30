@@ -14,6 +14,8 @@ const NavBar = () => {
     const { pathname } = useLocation();
     const isHome = pathname === '/' || pathname.startsWith('/home');
     const isChat = pathname.startsWith('/chat');
+    const isTrip = pathname.startsWith('/trip');
+    const isMyPage = pathname.startsWith('/mypage');
 
     return (
         <div className={styles.navbar}>
@@ -31,13 +33,13 @@ const NavBar = () => {
                     </div>
                 </NavLink>
                 <NavLink to="/trip" className={styles.link}>
-                    <div className={styles.icon_box}>
+                    <div className={`${styles.icon_box} ${isTrip ? styles.active : ''}`}>
                         <MaskIcon src={schedule} alt="Trip" />
                         <span className={styles.icon_text}>Trip</span>
                     </div>
                 </NavLink>
                 <NavLink to="/mypage" className={styles.link}>
-                    <div className={styles.icon_box}>
+                    <div className={`${styles.icon_box} ${isMyPage ? styles.active : ''}`}>
                         <MaskIcon src={profile} alt="Profile" />
                         <span className={styles.icon_text}>MyPage</span>
                     </div>

@@ -1,5 +1,7 @@
 .screen {
-    min-height: 100vh;
+    /* [수정] 100vh 대신 100% 사용 및 전체 스크롤 방지 */
+    height: 100%;
+    overflow: hidden;
     background: #f6f3ec;
     display: flex;
     flex-direction: column;
@@ -8,11 +10,13 @@
 }
 
 .topBarWrapper {
+    /* Flex 구조상 상단에 고정되므로 sticky 제거 가능하지만 유지해도 무방 */
     position: sticky;
     top: 0;
     z-index: 5;
     background: #f6f3ec;
     padding-top: 60px;
+    flex-shrink: 0; /* 크기 축소 방지 */
 }
 
 .topBar {
@@ -72,20 +76,64 @@
     padding: 0;
 }
 
+.aiToolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px 4px;
+    background: transparent;
+}
+
+.aiButton {
+    background: #78d9e2;
+    color: #0f0f0f;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+}
+
+.aiButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.aiButton:not(:disabled):active {
+    transform: translateY(1px);
+}
+
+.aiError {
+    font-size: 12px;
+    color: #d9534f;
+}
+
 .messageList {
     flex: 1;
     padding: 20px 17px 5px;
     display: flex;
     flex-direction: column;
-    gap: 12px; /* 간격 살짝 줄임 */
+    gap: 12px;
+    
+    /* [수정] 여기가 스크롤 되는 영역임을 명시 */
     overflow-y: auto;
+    
+    /* 스크롤바 숨김 (선택사항) */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-/* Flex Container for Messages */
+.messageList::-webkit-scrollbar {
+    display: none;
+}
+
 .messageRow {
     display: flex;
     align-items: flex-start;
-    gap: 8px; /* 간격 살짝 줄임 */
+    gap: 8px;
 }
 
 .otherRow {
@@ -96,7 +144,6 @@
     justify-content: flex-end;
 }
 
-/* [수정 4] 프로필 크기 축소 (46px -> 38px) */
 .avatar {
     width: 38px;
     height: 38px;
@@ -121,18 +168,17 @@
 }
 
 .senderName {
-    font-size: 12px; /* 이름 폰트도 살짝 축소 */
+    font-size: 12px;
     font-weight: 600;
     color: #1f1510;
     margin-left: 4px;
 }
 
-/* [수정 3] 채팅 폰트 및 말풍선 크기 축소 */
 .bubble {
     background: #fff;
-    border-radius: 16px; /* 라운드 살짝 축소 */
-    padding: 8px 12px;   /* 패딩 축소 (기존 12px 14px) */
-    font-size: 14px;     /* 폰트 크기 축소 (기존 16px) */
+    border-radius: 16px;
+    padding: 8px 12px;
+    font-size: 14px;
     line-height: 1.4;
     color: #1f1510;
     word-break: break-all;
@@ -148,7 +194,45 @@
     background: #ffd77a;
 }
 
+.aiKeywordCard {
+    align-self: center;
+    max-width: 90%;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 12px 14px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.aiKeywordTitle {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f1510;
+}
+
+.aiKeywordList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.aiKeywordChip {
+    background: #f8f1de;
+    color: #5a4636;
+    padding: 6px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #eedab4;
+}
+
 .inputBar {
+    /* Flex 구조상 하단에 위치하므로 sticky 제거 가능, 유지해도 무방 */
     position: sticky;
     bottom: 0;
     padding: 10px 12px 12px;
@@ -157,6 +241,7 @@
     justify-content: center;
     gap: 12px;
     background: #f6f3ec;
+    flex-shrink: 0; /* 크기 축소 방지 */
 }
 
 .input {
