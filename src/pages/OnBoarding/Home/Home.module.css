@@ -71,7 +71,6 @@
     height: 51px;
     border-radius: 30px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     background-color: #FFF7D7;
     position: relative;
@@ -90,10 +89,22 @@
 }
 
 .searchBar__icon {
-    margin-left: 23px;
-    margin-right: 16px;
     width: 18px;
     height: 17px;
+}
+
+.searchBar__iconButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 23px;
+    margin-right: 16px;
+    padding: 0;
+    width: 18px;
+    height: 17px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
 }
 
 .searchBar__input:focus {

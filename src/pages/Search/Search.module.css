@@ -1,0 +1,163 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px 18px 120px;
+}
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 18px;
+    background-color: #fff7d7;
+    border: 1px solid #ffe1aa;
+}
+
+.searchButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.searchButton:focus-visible {
+    outline: 2px solid #ffb347;
+    outline-offset: 2px;
+}
+
+.searchIcon {
+    width: 18px;
+    height: 18px;
+}
+
+.searchInput {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 700;
+    color: #34220f;
+}
+
+.searchInput:focus {
+    outline: none;
+}
+
+.helperText {
+    margin: 0;
+    font-size: 14px;
+    color: #6b5237;
+    padding: 0 2px;
+}
+
+.errorText {
+    color: #d42828;
+}
+
+.results {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.resultCard {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 16px;
+    text-decoration: none;
+    color: #2d1b10;
+    border: 1px solid #f0e6d6;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.resultCard:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+}
+
+.thumbnail {
+    width: 96px;
+    height: 96px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #ffeeda 0%, #ffd3a0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thumbnailImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnailPlaceholder {
+    font-size: 12px;
+    color: #6b5237;
+    text-align: center;
+    padding: 8px;
+    line-height: 1.4;
+}
+
+.cardBody {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.storeName {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    color: #2d1b10;
+}
+
+.ratingBadge {
+    padding: 4px 10px;
+    border-radius: 10px;
+    background-color: #fff7d7;
+    color: #ff3c01;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.category {
+    margin: 0;
+    font-size: 13px;
+    color: #8c6b4a;
+    font-weight: 600;
+}
+
+.address {
+    margin: 0;
+    font-size: 13px;
+    color: #3b2718;
+    line-height: 1.4;
+}
+
+.reviewCount {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #6b5237;
+    font-weight: 700;
+}

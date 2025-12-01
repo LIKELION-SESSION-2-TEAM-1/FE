@@ -22,6 +22,9 @@
     justify-content: space-between;
     box-shadow: none;
     overflow: hidden; /* 이미지가 커져도 카드 밖으로는 보이지 않게 클리핑 */
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
 }
 
 .bannerText {

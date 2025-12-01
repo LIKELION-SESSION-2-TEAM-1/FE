@@ -8,6 +8,7 @@ import Home from './pages/OnBoarding/Home/Home';
 import ChatList from './pages/Chatting/ChatList/ChatList';
 import ChatRoom from './pages/Chatting/ChatRoom/ChatRoom';
 import Dogeja from './pages/Dogeja/Dogeja';
+import Search from './pages/Search/Search';
 
 function App() {
     const { pathname } = useLocation();
@@ -26,6 +27,7 @@ function App() {
                         <Route path="/chatlist" element={<ChatList />} />
                         <Route path="/chatroom" element={<ChatRoom />} />
                         <Route path="/dogeja" element={<Dogeja />} />
+                        <Route path="/search" element={<Search />} />
                     </Routes>
                 </div>
                 {!isChatRoom && !hideNav && <NavBar />}

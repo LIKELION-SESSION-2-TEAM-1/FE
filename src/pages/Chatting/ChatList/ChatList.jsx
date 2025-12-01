@@ -9,14 +9,19 @@ const ChatList = () => {
 
     return (
         <div className={styles.page}>
-            <div className={styles.bannerCard}>
+            <a
+                className={styles.bannerCard}
+                href="https://www.11st.co.kr/products/1522183727?srsltid=AfmBOop00C9hBt4wlKbrWq7zKPV6_QymAnHqnQx_0PwHUO15aXQhGmZu"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 <div className={styles.bannerText}>
                     <p className={styles.bannerTitle}>신안 천일염 할인</p>
                     <p className={styles.bannerSubtitle}>최대 30% 할인 (~12.31)</p>
                     <p className={styles.bannerBrand}>SINAN SEA SALT</p>
                 </div>
                 <img className={styles.bannerImage} src={bannerImg} alt="신안 천일염 프로모션" />
-            </div>
+            </a>
 
             <div className={styles.sectionHeader}>
                 <span className={styles.sectionTitle}>참여중인 여행톡</span>
