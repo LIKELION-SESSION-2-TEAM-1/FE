@@ -1,5 +1,7 @@
 import { request } from "./api";
 
+const SEARCH_API_BASE_URL = "https://port-0-bemaster-mild533144fe3281.sel3.cloudtype.app";
+
 /**
  * 여행지(스토어) 검색
  * @param {string} keyword - 검색어
@@ -12,7 +14,7 @@ export const searchStores = async (keyword) => {
     }
 
     const path = `/api/stores/search?keyword=${encodeURIComponent(term)}`;
-    const result = await request(path);
+    const result = await request(path, { baseUrl: SEARCH_API_BASE_URL });
 
     const candidates = [
         result,

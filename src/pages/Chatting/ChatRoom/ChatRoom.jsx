@@ -2,7 +2,7 @@ import styles from './ChatRoom.module.css';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import WSClient from '../../../websocket/WebSocket'; 
-import { fetchAiKeywords } from '../../../apis/aiApi';
+import { fetchAiKeywords, fetchAiPlan } from '../../../apis/aiApi';
 import sendIcon from "../../../assets/pic/send.svg";
 import searchIcon from "../../../assets/pic/search.svg";
 import menuIcon from "../../../assets/pic/menu.svg";
@@ -16,6 +16,7 @@ const ChatRoom = () => {
     const [activeRoom, setActiveRoom] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [aiKeywords, setAiKeywords] = useState([]);
+    const [aiPlan, setAiPlan] = useState(null);
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState(null);
     const [aiInsertIndex, setAiInsertIndex] = useState(null);
@@ -139,18 +140,36 @@ const ChatRoom = () => {
     const handleAiAnalyze = async () => {
         if (aiLoading || !activeRoom) return;
         const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 1;
+        setAiLoading(true);
+        setAiError(null);
+        setAiPlan(null);
+        setAiInsertIndex(null);
+        setAiKeywords([]);
         try {
-            setAiLoading(true);
-            setAiError(null);
-
             const result = await fetchAiKeywords(roomId);
             const keywords = Array.isArray(result?.keywords) ? result.keywords : [];
+            const normalizedKeywords = keywords
+                .map((kw) => (kw === null || kw === undefined ? "" : String(kw).trim()))
+                .filter(Boolean);
 
-            setAiKeywords(keywords);
-            setAiInsertIndex(keywords.length ? messagesRef.current.length : null);
+            if (!normalizedKeywords.length) {
+                throw new Error("AI가 키워드를 찾지 못했습니다.");
+            }
+
+            const insertIndex = messagesRef.current.length;
+            setAiKeywords(normalizedKeywords);
+            setAiInsertIndex(insertIndex);
+
+            try {
+                const planResult = await fetchAiPlan(normalizedKeywords);
+                setAiPlan(planResult);
+            } catch (planError) {
+                console.error(planError);
+                setAiError(planError?.message || "여행 계획 생성에 실패했습니다.");
+            }
         } catch (e) {
             console.error(e);
-            setAiError("AI 분석에 실패했습니다. 잠시 후 다시 시도해주세요.");
+            setAiError(e?.message || "AI 분석에 실패했습니다. 잠시 후 다시 시도해주세요.");
         } finally {
             setAiLoading(false);
         }
@@ -166,18 +185,74 @@ const ChatRoom = () => {
 
     if (isLoading) return <div className={styles.loadingScreen}>채팅방에 입장 중입니다...</div>;
 
-    const renderAiBlock = () => (
-        <div className={styles.aiKeywordCard}>
-            <p className={styles.aiKeywordTitle}>
-                AI 분석을 통해 현재 채팅방의 여행 핵심 키워드를 정리해드려요!
-            </p>
-            <div className={styles.aiKeywordList}>
-                {aiKeywords.map((kw, idx) => (
-                    <span key={`${kw}-${idx}`} className={styles.aiKeywordChip}>{kw}</span>
-                ))}
+    const renderAiBlock = () => {
+        const schedule = Array.isArray(aiPlan?.schedule) ? aiPlan.schedule : [];
+
+        return (
+            <div className={styles.aiKeywordCard}>
+                <p className={styles.aiKeywordTitle}>
+                    AI 분석을 통해 현재 채팅방의 여행 핵심 키워드를 정리해드려요!
+                </p>
+                <div className={styles.aiKeywordList}>
+                    {aiKeywords.map((kw, idx) => (
+                        <span key={`${kw}-${idx}`} className={styles.aiKeywordChip}>{kw}</span>
+                    ))}
+                </div>
+
+                <div className={styles.aiPlanSection}>
+                    <div className={styles.aiPlanHeader}>
+                        <div className={styles.aiPlanHeadingText}>
+                            <p className={styles.aiPlanLabel}>여행 계획</p>
+                            {aiPlan?.title && <h4 className={styles.aiPlanTitle}>{aiPlan.title}</h4>}
+                        </div>
+                        {aiLoading && !aiPlan && <span className={styles.aiPlanBadge}>생성 중...</span>}
+                    </div>
+                    {aiPlan?.description && (
+                        <p className={styles.aiPlanDescription}>{aiPlan.description}</p>
+                    )}
+
+                    {schedule.length > 0 ? (
+                        <div className={styles.aiPlanDays}>
+                            {schedule.map((dayPlan, idx) => {
+                                const places = Array.isArray(dayPlan?.places) ? dayPlan.places : [];
+                                const dayLabel =
+                                    dayPlan?.day === 0 || dayPlan?.day
+                                        ? `Day ${dayPlan.day}`
+                                        : `Day ${idx + 1}`;
+
+                                return (
+                                    <div key={`day-${idx}`} className={styles.aiPlanDay}>
+                                        <div className={styles.aiPlanDayTitle}>{dayLabel}</div>
+                                        <div className={styles.aiPlanPlaces}>
+                                            {places.map((place, pIdx) => (
+                                                <div key={`place-${pIdx}`} className={styles.aiPlanPlace}>
+                                                    <div className={styles.aiPlanPlaceName}>{place?.name || "추천 장소"}</div>
+                                                    <div className={styles.aiPlanPlaceMeta}>
+                                                        {place?.category && <span>{place.category}</span>}
+                                                        {place?.address && <span>{place.address}</span>}
+                                                    </div>
+                                                    {place?.distanceToNext && (
+                                                        <div className={styles.aiPlanDistance}>다음까지 {place.distanceToNext}</div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            {places.length === 0 && (
+                                                <div className={styles.aiPlanEmpty}>추천 장소 정보가 없습니다.</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <p className={styles.aiPlanEmpty}>
+                            {aiLoading ? "여행 계획을 구성하고 있습니다..." : "생성된 여행 계획이 없습니다."}
+                        </p>
+                    )}
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     const shouldRenderAi = aiKeywords.length > 0 && aiInsertIndex !== null;
 
