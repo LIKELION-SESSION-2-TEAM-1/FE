@@ -1,21 +1,23 @@
-const API_BASE_URL = "https://port-0-tokplan-mild533144fe3281.sel3.cloudtype.app/";
-const WS_PATHS = ["", "/ws", "/ws/chat", "/stomp-ws", "/ws-stomp", "/socket"];
-const DEFAULT_WS_URLS = WS_PATHS.map((p) => API_BASE_URL.replace(/\/$/, "").replace(/^http/, "ws") + p);
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+
+export const API_BASE_URL = "https://port-0-tokplan-mild533144fe3281.sel3.cloudtype.app/";
+
+// 백엔드 STOMP 전용 엔드포인트 및 pub/sub 경로
+const WS_ENDPOINT = `${API_BASE_URL.replace(/\/$/, "")}/stomp-ws`;
+const PUB_ENDPOINTS = (roomId) => [`/pub/chat/${roomId}`];
+const SUB_ENDPOINTS = (roomId) => [`/sub/chat/${roomId}`];
 
 export default class WSClient {
-    constructor(urls = DEFAULT_WS_URLS, { reconnect = false, reconnectDelay = 2000 } = {}) {
-        this.urls = Array.isArray(urls) ? urls : [urls];
-        this._urlIndex = 0;
-        this.reconnect = reconnect;
+    constructor({ roomId, reconnectDelay = 5000 } = {}) {
+        this.roomId = roomId ?? 0;
         this.reconnectDelay = reconnectDelay;
-
-        this.ws = null;
+        this.client = null;
+        this.subscriptions = [];
         this.connected = false;
-        this._shouldReconnect = reconnect;
-        this._connecting = false;
-        this._pendingMessages = [];
-        this._currentUrl = null;
-
+        this.onMessage = null; // 메시지 수신 시 실행할 콜백
+        this.onConnect = null; // 연결 성공 시 실행할 콜백
+        this.onDisconnect = null; // 연결 종료 시 실행할 콜백
         this.listeners = {
             open: new Set(),
             message: new Set(),
@@ -24,29 +26,99 @@ export default class WSClient {
         };
     }
 
-    connect() {
-        if (this.connected || this._connecting) return;
-        this._tryConnect(this._urlIndex);
-    }
+    // 연결 시작
+    connect({ onMessage, onConnect, onDisconnect } = {}) {
+        if (this.client?.active) return; // 이미 활성화된 경우 중복 연결 방지
 
-    send(data) {
-        const payload = typeof data === "string" ? data : JSON.stringify(data);
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send(payload);
-        } else {
-            this._pendingMessages.push(payload);
-            if (!this._connecting) {
-                this._tryConnect();
+        this.onMessage = onMessage;
+        this.onConnect = onConnect;
+        this.onDisconnect = onDisconnect;
+
+        const client = new Client({
+            webSocketFactory: () => new SockJS(WS_ENDPOINT),
+            reconnectDelay: this.reconnectDelay,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+            
+            onConnect: (frame) => {
+                console.log('[WS] Connected');
+                this.connected = true;
+                this._subscribe(); // 연결되면 구독 설정
+                if (this.onConnect) this.onConnect(frame);
+                this._emit("open");
+            },
+            
+            onStompError: (frame) => {
+                console.error('[WS] Broker reported error: ' + frame.headers['message']);
+                console.error('[WS] Additional details: ' + frame.body);
+                this._emit("error", new Error(frame?.headers?.message || "STOMP error"));
+            },
+
+            onWebSocketClose: () => {
+                console.log('[WS] Closed');
+                this.connected = false;
+                if (this.onDisconnect) this.onDisconnect();
+                this._emit("close");
             }
-        }
+        });
+
+        this.client = client;
+        client.activate();
     }
 
-    close() {
-        try {
-            this._shouldReconnect = false;
-            this.ws?.close();
-        } catch {
+    // 구독 설정 (내부용)
+    _subscribe() {
+        if (!this.client || !this.client.connected) return;
+
+        // 기존 구독 해제
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions = [];
+
+        // 설정된 모든 엔드포인트 구독
+        SUB_ENDPOINTS(this.roomId).forEach(dest => {
+            const sub = this.client.subscribe(dest, (message) => {
+                if (!message.body) return;
+                try {
+                    const payload = JSON.parse(message.body);
+                    this.onMessage?.(payload);
+                    this._emit("message", payload);
+                } catch (e) {
+                    console.error('[WS] JSON Parse Error', e);
+                    const raw = { raw: message.body };
+                    this.onMessage?.(raw);
+                    this._emit("message", raw);
+                }
+            });
+            this.subscriptions.push(sub);
+        });
+    }
+
+    // 메시지 전송
+    send(messageObj) {
+        if (!this.client || !this.client.connected) {
+            console.warn('[WS] Cannot send message: Client not connected');
+            return;
         }
+
+        const payload = JSON.stringify(messageObj);
+
+        PUB_ENDPOINTS(this.roomId).forEach(dest => {
+            this.client.publish({
+                destination: dest,
+                body: payload
+            });
+        });
+    }
+
+    // 연결 종료
+    disconnect() {
+        if (this.client) {
+            this.client.deactivate();
+            console.log('[WS] Disconnected by user');
+        }
+        this.connected = false;
+        this.subscriptions = [];
+        this._emit("close");
     }
 
     on(event, handler) {
@@ -62,105 +134,60 @@ export default class WSClient {
         this.listeners[event]?.forEach((fn) => fn(...args));
     }
 
-    _tryConnect(idx = 0) {
-        const targetUrl = this.urls[idx];
-        if (!targetUrl) {
-            this._connecting = false;
-            return;
-        }
-
-        try {
-            this._connecting = true;
-            this._currentUrl = targetUrl;
-            this.ws = new WebSocket(targetUrl);
-
-            this.ws.onopen = () => {
-                this.connected = true;
-                this._connecting = false;
-                this._emit("open");
-                if (this._pendingMessages.length) {
-                    this._pendingMessages.forEach((p) => this.ws.send(p));
-                    this._pendingMessages = [];
-                }
-            };
-
-            this.ws.onmessage = (evt) => {
-                const raw = evt.data;
-                let parsed = raw;
-                try {
-                    parsed = JSON.parse(raw);
-                } catch {
-                }
-                this._emit("message", parsed);
-            };
-
-            this.ws.onerror = () => {};
-
-            this.ws.onclose = () => {
-                const wasConnected = this.connected;
-                this.connected = false;
-                this._connecting = false;
-
-                // 초기 연결 실패 시 다음 경로 시도
-                if (!wasConnected) {
-                    this._urlIndex = idx + 1;
-                    setTimeout(() => this._tryConnect(this._urlIndex), this.reconnectDelay);
-                    return;
-                }
-
-                // 연결 후 끊어지면 첫 번째 경로부터 재시도
-                if (this._shouldReconnect) {
-                    setTimeout(() => {
-                        this._urlIndex = 0;
-                        this._tryConnect(0);
-                    }, this.reconnectDelay);
-                }
-            };
-        } catch {
-            this._connecting = false;
-            setTimeout(() => this._tryConnect(idx + 1), this.reconnectDelay);
-        }
-    }
-
-    static buildTalkMessage({ text, senderName = "tester", chatRoomId = 1 }) {
+    // 메시지 객체 생성 헬퍼
+    static buildTalkMessage({ text, senderName = "User", chatRoomId = 0 }) {
+        // 임시 ID 생성 (서버 응답 전 UI 표시용)
+        const tempId = `temp-${Date.now()}`;
         return {
-            id: undefined,
-            chatRoomId,
-            senderUserId: 1,
-            senderName,
+            // id: undefined, // 서버에서 생성
+            chatRoomId: chatRoomId,
+            senderUserId: 0, // 로그인한 유저 ID (필요시 수정)
+            senderName: senderName,
             receiverUserId: 0,
             receiverName: "",
             message: text,
-            messageType: "TALK",
+            messageType: "TALK", // JOIN, TALK 등
             ts: new Date().toISOString(),
+            clientTempId: tempId
         };
     }
 
+    // --- REST API Helpers ---
+
     static async fetchRooms() {
-        const res = await fetch(`${API_BASE_URL}api/chats/rooms`);
-        if (!res.ok) {
-            throw new Error("채팅방 목록을 불러오지 못했습니다.");
+        try {
+            const res = await fetch(`${API_BASE_URL}api/chats/rooms`);
+            if (!res.ok) throw new Error("Failed to fetch rooms");
+            return await res.json();
+        } catch (e) {
+            console.error(e);
+            return [];
         }
-        return res.json();
     }
 
-    static async createRoom(body = { name: "새 채팅방" }) {
-        const res = await fetch(`${API_BASE_URL}api/chats/rooms`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-        });
-        if (!res.ok) {
-            throw new Error("채팅방 생성에 실패했습니다.");
+    static async createRoom(name = "새 채팅방") {
+        try {
+            const res = await fetch(`${API_BASE_URL}api/chats/rooms`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, roomId: 0, id: "" }), // API 스펙에 맞춤
+            });
+            if (!res.ok) throw new Error("Failed to create room");
+            return await res.json();
+        } catch (e) {
+            console.error(e);
+            return null;
         }
-        return res.json();
     }
 
     static async fetchChats(chatRoomId) {
-        const res = await fetch(`${API_BASE_URL}api/chats/${chatRoomId}`);
-        if (!res.ok) {
-            throw new Error("채팅 내역을 불러오지 못했습니다.");
+        try {
+            const res = await fetch(`${API_BASE_URL}api/chats/${chatRoomId}`);
+            if (!res.ok) throw new Error("Failed to fetch chats");
+            return await res.json();
+        } catch (e) {
+            console.error(e);
+            return [];
         }
-        return res.json();
     }
 }

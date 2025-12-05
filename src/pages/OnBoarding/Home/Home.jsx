@@ -1,19 +1,21 @@
 import styles from './Home.module.css';
 import pic from "../../../assets/pic/pic1.png";
 import arrow from "../../../assets/pic/arrow.svg";
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate, createSearchParams } from 'react-router-dom';
 import search from "../../../assets/pic/search.svg";
 import trip from "../../../assets/pic/trip.svg";
 import pic2 from "../../../assets/pic/pic2.png";
 import pic3 from "../../../assets/pic/pic3.png";
 import arrow3 from "../../../assets/pic/arrow3.svg";
-import React,{ useState } from 'react';
+import React, { useState } from 'react';
 import ReccoDetail from "../../../components/Home/ReccoDetail";
 import PopularDetail from "../../../components/Home/PopularDetail";
 
 const Home = () => {
-
+    const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
     const [isReccoExpanded, setIsReccoExpanded] = useState(false);
+    const [isPopularExpanded, setIsPopularExpanded] = useState(false);
 
     const handleReccoToggle = () => {
         setIsReccoExpanded(prev => !prev);
@@ -22,8 +24,6 @@ const Home = () => {
     const handleDetailClose = () => {
         setIsReccoExpanded(false);
     };
-    
-    const [isPopularExpanded, setIsPopularExpanded] = useState(false);
 
     const handlePopularToggle = () => {
         setIsPopularExpanded(prev => !prev);
@@ -32,6 +32,18 @@ const Home = () => {
     const handlePopularClose = () => {
         setIsPopularExpanded(false);
     }
+
+    const handleSearchSubmit = (event) => {
+        event.preventDefault();
+        const term = searchTerm.trim();
+        if (!term) return;
+        
+        // [수정] createSearchParams를 사용하여 인코딩 및 URL 생성 안전성 확보
+        navigate({
+            pathname: '/search',
+            search: `?${createSearchParams({ keyword: term })}`
+        });
+    };
 
     return (
         <div className={styles.main__wrapper}>
@@ -50,10 +62,18 @@ const Home = () => {
                     </div>
                     </NavLink>
                     
-                    <div className={styles.searchBar}>
-                        <img src={search} alt="" className={styles.searchBar__icon}/>
-                        <input className={styles.searchBar__input} type="search" placeholder='여행지 검색하기' />
-                    </div>
+                    <form className={styles.searchBar} onSubmit={handleSearchSubmit}>
+                        <button type="submit" className={styles.searchBar__iconButton} aria-label="여행지 검색">
+                            <img src={search} alt="" className={styles.searchBar__icon}/>
+                        </button>
+                        <input
+                            className={styles.searchBar__input}
+                            type="search"
+                            placeholder='여행지 검색하기'
+                            value={searchTerm}
+                            onChange={(event) => setSearchTerm(event.target.value)}
+                        />
+                    </form>
 
                     {isReccoExpanded ? (
                         <ReccoDetail className={styles.detailClass} onClose={handleDetailClose}/>
