@@ -7,7 +7,6 @@ import StartButton from '../../components/Landing/StartButton';
 const Landing = () => {
     return (
         <div className={styles.container}>
-            <div className={styles.backgroundPattern}></div>
             <img src={logo} alt="TokPlan Logo" className={styles.logo} />
 
             <BackgroundPattern />

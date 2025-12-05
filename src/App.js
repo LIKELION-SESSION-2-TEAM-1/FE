@@ -8,10 +8,11 @@ import Landing from './pages/Landing/Landing';
 import Home from './pages/OnBoarding/Home/Home';
 import ChatList from './pages/Chatting/ChatList/ChatList';
 import ChatRoom from './pages/Chatting/ChatRoom/ChatRoom';
+import Login from './pages/Login/Login';
 
 function App() {
     const { pathname } = useLocation();
-    const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/';
+    const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/' || pathname === '/login';
     const isChatRoom = pathname === '/chatroom';
 
     return (
@@ -25,9 +26,10 @@ function App() {
                         <Route path="/home" element={<Home />} />
                         <Route path="/chatlist" element={<ChatList />} />
                         <Route path="/chatroom" element={<ChatRoom />} />
+                        <Route path="/login" element={<Login />} />
                     </Routes>
                 </div>
-                {!isChatRoom && pathname !== '/' && <NavBar />}
+                {!isChatRoom && pathname !== '/' && pathname !== '/login' && <NavBar />}
                 <img src={require('./assets/pic/Home Indicator.png')} alt="" className={frame.homeIndicator} />
             </div>
         </div>
