@@ -1,49 +1,108 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import styles from './Login.module.css';
-import logo from '../../assets/pic/TokPlan.png';
 import BackgroundPattern from '../../components/Landing/BackgroundPattern';
-import kakao from '../../assets/oauth/카톡.png';
-import naver from '../../assets/oauth/네이버.png';
-import google from '../../assets/oauth/구글.png';
-import StartButton from '../../components/Landing/StartButton';
+import arrow from '../../assets/pic/arrow.svg';
+import { login } from '../../apis/api';
+
+import Loading from '../../components/Loading/Loading';
 
 const Login = () => {
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        username: '',
+        password: ''
+    });
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async () => {
+        if (!formData.username || !formData.password) return;
+
+        setIsLoading(true);
+        try {
+            const response = await login(formData.username, formData.password);
+
+            console.log('Login Response:', response);
+            console.log('Response Headers:', response.headers);
+
+            const token = response.headers['authorization'] || response.headers['Authorization'];
+
+            if (token) {
+                localStorage.setItem('accessToken', token);
+                navigate('/home');
+            } else {
+                console.warn('Token missing in response headers');
+                alert('로그인에 실패했습니다. (서버 응답 오류)');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            if (error.response && error.response.data) {
+                const message = error.response.data.message || error.response.data;
+                alert(`로그인 실패: ${typeof message === 'string' ? message : '아이디와 비밀번호를 확인해주세요.'}`);
+            } else {
+                alert('로그인에 실패했습니다.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const isFormValid = formData.username.length > 0 && formData.password.length > 0;
+
     return (
         <div className={styles.container}>
-            {/* 배경 패턴 및 로고 */}
+            {isLoading && <Loading />}
             <BackgroundPattern />
 
-            <img src={logo} alt="TokPlan Logo" className={styles.logo} />
+            <h2 className={styles.title}>로그인</h2>
 
-            <div className={styles.contentWrapper}>
-                {/* 로그인/회원가입 버튼 */}
-                <div className={styles.buttonGroup}>
-                    <StartButton
-                        to="/login-form"
-                        text="로그인"
-                        style={{ width: '270px', height: '61px', justifyContent: 'space-between' }}
-                        arrowStyle={{ width: '40px', height: '40px' }}
-                    />
-                    <StartButton
-                        to="/signup"
-                        text="회원가입"
-                        style={{ width: '270px', height: '61px', justifyContent: 'space-between' }}
-                        arrowStyle={{ width: '40px', height: '40px' }}
+            <div className={styles.formContainer}>
+                <div className={styles.inputGroup}>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="아이디"
+                        className={`${styles.inputField} ${formData.username ? styles.filled : ''}`}
+                        value={formData.username}
+                        onChange={handleChange}
                     />
                 </div>
 
-                {/* 소셜 로그인 버튼 */}
-                <div className={styles.socialGroup}>
-                    <button className={styles.socialBtn} style={{ backgroundColor: '#FEE500' }}>
-                        <img src={kakao} alt="Kakao" />
-                    </button>
-                    <button className={styles.socialBtn} style={{ backgroundColor: '#03C75A' }}>
-                        <img src={naver} alt="Naver" />
-                    </button>
-                    <button className={styles.socialBtn} style={{ backgroundColor: '#FFFFFF' }}>
-                        <img src={google} alt="Google" />
-                    </button>
+                <div className={styles.inputGroup}>
+                    <div className={styles.inputWrapper}>
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="비밀번호"
+                            className={`${styles.inputField} ${formData.password ? styles.filled : ''}`}
+                            value={formData.password}
+                            onChange={handleChange}
+                        />
+                        <button
+                            className={styles.eyeButton}
+                            onClick={() => setShowPassword(!showPassword)}
+                            type="button"
+                        >
+                            {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                        </button>
+                    </div>
                 </div>
+
+                <button
+                    className={`${styles.submitButton} ${isFormValid ? styles.active : ''}`}
+                    onClick={handleSubmit}
+                    disabled={!isFormValid}
+                >
+                    로그인
+                    <img src={arrow} alt="" className={styles.arrowIcon} />
+                </button>
             </div>
         </div>
     );

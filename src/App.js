@@ -8,11 +8,13 @@ import Landing from './pages/Landing/Landing';
 import Home from './pages/OnBoarding/Home/Home';
 import ChatList from './pages/Chatting/ChatList/ChatList';
 import ChatRoom from './pages/Chatting/ChatRoom/ChatRoom';
+import AuthChoice from './pages/AuthChoice/AuthChoice';
+import Signup from './pages/Signup/Signup';
 import Login from './pages/Login/Login';
 
 function App() {
     const { pathname } = useLocation();
-    const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/' || pathname === '/login';
+    const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/' || pathname === '/start';
     const isChatRoom = pathname === '/chatroom';
 
     return (
@@ -26,10 +28,12 @@ function App() {
                         <Route path="/home" element={<Home />} />
                         <Route path="/chatlist" element={<ChatList />} />
                         <Route path="/chatroom" element={<ChatRoom />} />
+                        <Route path="/start" element={<AuthChoice />} />
                         <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
                     </Routes>
                 </div>
-                {!isChatRoom && pathname !== '/' && pathname !== '/login' && <NavBar />}
+                {!isChatRoom && pathname !== '/' && pathname !== '/start' && pathname !== '/login' && pathname !== '/signup' && <NavBar />}
                 <img src={require('./assets/pic/Home Indicator.png')} alt="" className={frame.homeIndicator} />
             </div>
         </div>
