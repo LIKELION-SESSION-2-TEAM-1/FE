@@ -45,8 +45,13 @@
     padding: 0;
 }
 
-.input::-webkit-scrollbar { display: none; }
-.input::placeholder { color: #626262; }
+.input::-webkit-scrollbar {
+    display: none;
+}
+
+.input::placeholder {
+    color: #626262;
+}
 
 .sendBtn {
     position: absolute;
@@ -62,6 +67,11 @@
     cursor: default;
 }
 
+.sendBtn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
 .sendBtnActive {
     cursor: pointer;
 }
@@ -72,6 +82,7 @@
     display: block;
     top: 0px;
     left: 6px;
+    pointer-events: none;
 }
 
 .listWrapper {
@@ -97,6 +108,7 @@
 .list::-webkit-scrollbar {
     display: none;
 }
+
 .msgBox {
     background: #ffffff;
     border: 1px solid #eee;

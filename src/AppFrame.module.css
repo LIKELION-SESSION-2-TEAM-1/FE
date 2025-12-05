@@ -61,5 +61,25 @@
     background-color: #F6F3EC;
 }
 
-.backgroundChat::before { background: none; }
-.backgroundChat::after  { background-image: none; opacity: 0; }
+.backgroundChat::before {
+    background: none;
+}
+
+.backgroundChat::after {
+    background-image: none;
+    opacity: 0;
+}
+
+.noPadding {
+    padding-bottom: 0 !important;
+}
+
+.homeIndicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    z-index: 9999;
+    pointer-events: none;
+}

@@ -1,0 +1,25 @@
+.startButton {
+    box-sizing: border-box;
+    width: 316px;
+    height: 61px;
+    background-color: #FF3C01;
+    color: white;
+    border-radius: 30px;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    padding: 0 20px;
+}
+
+.arrowIcon {
+    width: 20px;
+    height: 20px;
+    display: block;
+}

@@ -73,8 +73,9 @@ const ChatRoom = () => {
                 const arr = Array.isArray(data) ? data.slice() : [];
                 setMessages(arr);
                 scrollToBottom();
-            } catch {
-                // 조용히 진행
+            } catch (err) {
+                console.error("Bootstrap error:", err);
+                setError("채팅방 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
             } finally {
                 if (!cancelled) setLoadingHistory(false);
             }
@@ -101,8 +102,8 @@ const ChatRoom = () => {
                 mergeMessages([asObj]);
             }
         });
-        const offErr = ws.on("error", () => {});
-        const offClose = ws.on("close", () => {});
+        const offErr = ws.on("error", () => { });
+        const offClose = ws.on("close", () => { });
 
         ws.connect();
 
@@ -152,7 +153,10 @@ const ChatRoom = () => {
     const handleSend = () => {
         const trimmed = text.trim();
         if (!trimmed) return;
-        if (!activeRoom) return;
+        if (!activeRoom) {
+            alert("채팅방 정보가 없습니다. 새로고침 해주세요.");
+            return;
+        }
 
         const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
         const clientTempId = `temp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -169,7 +173,7 @@ const ChatRoom = () => {
         mergeMessages([talk]);
         ws.send(talk);
     };
-        
+
     return (
         <div className={styles.chat__wrapper}>
             <div className={styles.chat__container}>
@@ -178,19 +182,22 @@ const ChatRoom = () => {
                 {loadingHistory && (
                     <div className={styles.loading}>채팅 내역을 불러오는 중...</div>
                 )}
+                {error && (
+                    <div className={styles.errorBanner}>{error}</div>
+                )}
 
                 <div className={styles.listWrapper}>
                     <div className={styles.list} ref={listRef} aria-live="polite">
                         {messages.map((m, idx) => (
-                        <div key={m.ts ? `${m.ts}-${idx}` : idx} className={styles.msgBox}>
-                            <div className={styles.meta}>
-                                <span className={styles.name}>{m.senderName ?? 'unknown'}</span>
-                                <span className={styles.time}>
-                                    {m.ts ? new Date(m.ts).toLocaleString() : ''}
-                                </span>
+                            <div key={m.ts ? `${m.ts}-${idx}` : idx} className={styles.msgBox}>
+                                <div className={styles.meta}>
+                                    <span className={styles.name}>{m.senderName ?? 'unknown'}</span>
+                                    <span className={styles.time}>
+                                        {m.ts ? new Date(m.ts).toLocaleString() : ''}
+                                    </span>
+                                </div>
+                                <div className={styles.text}>{m.message ?? m.raw ?? ''}</div>
                             </div>
-                            <div className={styles.text}>{m.message ?? m.raw ?? ''}</div>
-                        </div>
                         ))}
                     </div>
                 </div>
