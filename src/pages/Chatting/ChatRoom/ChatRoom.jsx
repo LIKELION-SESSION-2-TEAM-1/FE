@@ -1,13 +1,19 @@
 import styles from './ChatRoom.module.css';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import WSClient from '../../../websocket/WebSocket'; 
+import WSClient from '../../../websocket/WebSocket';
 import { fetchAiKeywords, fetchAiPlan } from '../../../apis/aiApi';
 import sendIcon from "../../../assets/pic/send.svg";
 import searchIcon from "../../../assets/pic/search.svg";
 import menuIcon from "../../../assets/pic/menu.svg";
 import backIcon from "../../../assets/pic/arrow2.svg";
 import pic2 from "../../../assets/pic/pic2.png";
+
+// Helper function to generate unique keys for messages
+const keyOf = (m) =>
+    m?.id ||
+    m?.clientTempId ||
+    `${m?.chatRoomId}-${m?.senderUserId}-${m?.ts}`;
 
 const ChatRoom = () => {
     const navigate = useNavigate();
@@ -20,11 +26,11 @@ const ChatRoom = () => {
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState(null);
     const [aiInsertIndex, setAiInsertIndex] = useState(null);
-    
+
     // [수정] 스크롤 제어를 위한 Ref 추가
     const messagesEndRef = useRef(null);
     const messagesRef = useRef([]);
-    
+
     // 내 정보 관리
     const [me] = useState(() => {
         const savedId = sessionStorage.getItem("chat_userId");
@@ -33,13 +39,13 @@ const ChatRoom = () => {
         if (savedId && savedName) {
             return { userId: parseInt(savedId), userName: savedName };
         }
-        
-        const newId = Math.floor(Math.random() * 100000); 
+
+        const newId = Math.floor(Math.random() * 100000);
         const newName = `User_${newId}`;
-        
+
         sessionStorage.setItem("chat_userId", newId);
         sessionStorage.setItem("chat_userName", newName);
-        
+
         return { userId: newId, userName: newName };
     });
 
@@ -51,12 +57,12 @@ const ChatRoom = () => {
     const getUserColor = (id, name) => {
         const key = id ? String(id) : name;
         if (!key) return "#ddd";
-        
+
         let hash = 0;
         for (let i = 0; i < key.length; i++) {
             hash = key.charCodeAt(i) + ((hash << 5) - hash);
         }
-        
+
         let color = '#';
         for (let i = 0; i < 3; i++) {
             const value = (hash >> (i * 8)) & 0xFF;
@@ -64,6 +70,14 @@ const ChatRoom = () => {
         }
         return color;
     };
+
+    const handleReceive = useCallback((msg, roomId) => {
+        if (msg.chatRoomId && msg.chatRoomId !== roomId) return;
+        setMessages((prev) => {
+            const exists = prev.some((m) => keyOf(m) === keyOf(msg));
+            return exists ? prev : [...prev, msg];
+        });
+    }, []);
 
     // [수정] 메시지가 업데이트될 때마다 자동으로 스크롤 하단 이동
     useEffect(() => {
@@ -88,73 +102,11 @@ const ChatRoom = () => {
                 if (!room) room = await WSClient.createRoom("부산 여행");
                 setActiveRoom(room);
 
-<<<<<<< HEAD
-                const roomId = room?.roomId ?? room?.id ?? 0;
-                const data = await WSClient.fetchChats(roomId);
-                if (cancelled) return;
-                const arr = Array.isArray(data) ? data.slice() : [];
-                setMessages(arr);
-                scrollToBottom();
-            } catch (err) {
-                console.error("Bootstrap error:", err);
-                setError("채팅방 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
-            } finally {
-                if (!cancelled) setLoadingHistory(false);
-            }
-        };
-
-        bootstrap();
-
-        return () => {
-            cancelled = true;
-        };
-    }, []);
-
-    useEffect(() => {
-        const offOpen = ws.on("open", () => {
-            scrollToBottom();
-        });
-        const offMsg = ws.on("message", (msg) => {
-            const asObj = typeof msg === "string" ? { raw: msg } : msg;
-            const roomId = activeRoom?.roomId ?? activeRoom?.id ?? null;
-            if (roomId !== null && asObj?.chatRoomId !== undefined && asObj.chatRoomId !== roomId) {
-                return;
-            }
-            if (asObj?.messageType === "TALK" || asObj?.message) {
-                mergeMessages([asObj]);
-            }
-        });
-        const offErr = ws.on("error", () => { });
-        const offClose = ws.on("close", () => { });
-
-        ws.connect();
-
-        return () => {
-            offOpen();
-            offMsg();
-            offErr();
-            offClose();
-            ws.close();
-        };
-    }, [ws, activeRoom]);
-
-    useEffect(() => {
-        if (!activeRoom) return;
-        if (pollingRef.current) clearInterval(pollingRef.current);
-
-        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
-        const poll = async () => {
-            try {
-                const data = await WSClient.fetchChats(roomId);
-                if (Array.isArray(data)) {
-                    mergeMessages(data);
-=======
                 const roomId = room?.roomId ?? room?.id ?? 1;
-                
+
                 const history = await WSClient.fetchChats(roomId);
                 if (Array.isArray(history) && history.length) {
                     setMessages(history);
->>>>>>> 124aaf6b95c0d5557f719d33444979aa0f122e89
                 }
 
                 ws.roomId = roomId;
@@ -169,81 +121,22 @@ const ChatRoom = () => {
         };
         init();
         return () => ws.disconnect();
-    }, [ws]);
+    }, [ws, handleReceive]);
 
-    const keyOf = (m) =>
-        m?.id ||
-        m?.clientTempId ||
-        `${m?.chatRoomId}-${m?.senderUserId}-${m?.ts}`;
 
-    const handleReceive = (msg, roomId) => {
-        if (msg.chatRoomId && msg.chatRoomId !== roomId) return;
-        setMessages((prev) => {
-            const exists = prev.some((m) => keyOf(m) === keyOf(msg));
-            return exists ? prev : [...prev, msg];
-        });
-    };
+
+
 
     const handleSend = () => {
-<<<<<<< HEAD
-        const trimmed = text.trim();
-        if (!trimmed) return;
-        if (!activeRoom) {
-            alert("채팅방 정보가 없습니다. 새로고침 해주세요.");
-            return;
-        }
-
-        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
-        const clientTempId = `temp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-        const talk = {
-            ...WSClient.buildTalkMessage({ text: trimmed, senderName: "뿡뻉", chatRoomId: roomId }),
-            clientTempId,
-        };
-
-        setText("");
-        setHasText(false);
-        inputRef.current?.focus();
-
-        // WS 전송 시도 및 낙관적 UI 업데이트
-        mergeMessages([talk]);
-        ws.send(talk);
-    };
-
-    return (
-        <div className={styles.chat__wrapper}>
-            <div className={styles.chat__container}>
-                <ChatHeader onBack={() => navigate('/chatlist')} />
-
-                {loadingHistory && (
-                    <div className={styles.loading}>채팅 내역을 불러오는 중...</div>
-                )}
-                {error && (
-                    <div className={styles.errorBanner}>{error}</div>
-                )}
-
-                <div className={styles.listWrapper}>
-                    <div className={styles.list} ref={listRef} aria-live="polite">
-                        {messages.map((m, idx) => (
-                            <div key={m.ts ? `${m.ts}-${idx}` : idx} className={styles.msgBox}>
-                                <div className={styles.meta}>
-                                    <span className={styles.name}>{m.senderName ?? 'unknown'}</span>
-                                    <span className={styles.time}>
-                                        {m.ts ? new Date(m.ts).toLocaleString() : ''}
-                                    </span>
-                                </div>
-                                <div className={styles.text}>{m.message ?? m.raw ?? ''}</div>
-                            </div>
-                        ))}
-=======
         if (!text.trim() || !activeRoom) return;
         const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 1;
-        
+
         let payload = WSClient.buildTalkMessage({
             text,
             senderName: me.userName,
             chatRoomId: roomId,
         });
-        payload.senderUserId = me.userId; 
+        payload.senderUserId = me.userId;
 
         ws.send(payload);
         setText("");
@@ -318,7 +211,6 @@ const ChatRoom = () => {
                             {aiPlan?.title && <h4 className={styles.aiPlanTitle}>{aiPlan.title}</h4>}
                         </div>
                         {aiLoading && !aiPlan && <span className={styles.aiPlanBadge}>생성 중...</span>}
->>>>>>> 124aaf6b95c0d5557f719d33444979aa0f122e89
                     </div>
                     {aiPlan?.description && (
                         <p className={styles.aiPlanDescription}>{aiPlan.description}</p>
@@ -402,8 +294,8 @@ const ChatRoom = () => {
                 {messages.map((m, idx) => {
                     const isMe = (m.senderUserId === me.userId) || (!m.senderUserId && m.senderName === me.userName);
                     const avatarImg = m.senderName === "민수" ? pic2 : null;
-                    const avatarStyle = isMe 
-                        ? { background: myGradient } 
+                    const avatarStyle = isMe
+                        ? { background: myGradient }
                         : { background: getUserColor(m.senderUserId, m.senderName) };
 
                     return (
@@ -416,10 +308,10 @@ const ChatRoom = () => {
                                         {avatarImg ? (
                                             <img className={styles.avatar} src={avatarImg} alt={m.senderName} />
                                         ) : (
-                                            <div 
-                                                className={styles.unknownAvatar} 
-                                                style={avatarStyle} 
-                                                aria-label={m.senderName} 
+                                            <div
+                                                className={styles.unknownAvatar}
+                                                style={avatarStyle}
+                                                aria-label={m.senderName}
                                             />
                                         )}
                                         <div className={styles.bubbleWrap}>
@@ -434,8 +326,8 @@ const ChatRoom = () => {
                                 {isMe && (
                                     <>
                                         <div className={styles.bubbleWrap}>
-                                            <div 
-                                                className={styles.senderName} 
+                                            <div
+                                                className={styles.senderName}
                                                 style={{ textAlign: 'right', marginRight: '4px' }}
                                             >
                                                 me
@@ -447,10 +339,10 @@ const ChatRoom = () => {
                                         {avatarImg ? (
                                             <img className={styles.avatar} src={avatarImg} alt={m.senderName} />
                                         ) : (
-                                            <div 
-                                                className={styles.unknownAvatar} 
-                                                style={avatarStyle} 
-                                                aria-label="me" 
+                                            <div
+                                                className={styles.unknownAvatar}
+                                                style={avatarStyle}
+                                                aria-label="me"
                                             />
                                         )}
                                     </>

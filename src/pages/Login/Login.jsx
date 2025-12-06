@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import styles from './Login.module.css';
+import useAuthStore from '../../stores/useAuthStore';
 import BackgroundPattern from '../../components/Landing/BackgroundPattern';
 import arrow from '../../assets/pic/arrow.svg';
 import { login } from '../../apis/api';
@@ -35,7 +36,16 @@ const Login = () => {
             const token = response.headers['authorization'] || response.headers['Authorization'];
 
             if (token) {
+                // [Zustand] 스토어에 로그인 정보 저장 (localStorage 처리는 store 내부 또는 persist 미들웨어가 담당)
+                // username도 함께 저장하고 싶다면 인자로 전달
+                useAuthStore.getState().login(token, formData.username);
+
+                // 기존 수동 localStorage 저장은 제거해도 되지만, 
+                // persist 미들웨어를 안 쓴 다른 로직과의 호환성을 위해 남겨둘 수도 있음.
+                // 여기서는 깔끔하게 제거하고 store에 맡기는 것을 추천하거나, 
+                // 이미 다른 코드들이 localStorage.getItem('accessToken')을 쓰고 있다면 호환성을 위해 남겨둠.
                 localStorage.setItem('accessToken', token);
+
                 navigate('/home');
             } else {
                 console.warn('Token missing in response headers');
