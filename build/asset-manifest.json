@@ -1,9 +1,11 @@
 {
   "files": {
-    "main.css": "/static/css/main.f76508b7.css",
-    "main.js": "/static/js/main.7d4e1bbb.js",
+    "main.css": "/static/css/main.fc8cf5ab.css",
+    "main.js": "/static/js/main.bf11d32f.js",
     "static/media/sinan_salt.png": "/static/media/sinan_salt.398c89adb498cb2c03e6.png",
     "static/media/pic3.png": "/static/media/pic3.a724215e37ea4eb21576.png",
+    "static/media/dogeja_cat2.png": "/static/media/dogeja_cat2.35edf370e2c6ef1433ec.png",
+    "static/media/dogeja_cat1.png": "/static/media/dogeja_cat1.f4ebdc87c677446f7fe6.png",
     "static/media/pic1.png": "/static/media/pic1.31f1197f395c976989f9.png",
     "static/media/pic4.png": "/static/media/pic4.a9426694b03e66535109.png",
     "static/media/pic2.png": "/static/media/pic2.8be7114886bd0a76864c.png",
@@ -24,11 +26,11 @@
     "static/media/arrow4.svg": "/static/media/arrow4.9c96816ba1f54f92dd4d25abaaa5cd20.svg",
     "static/media/arrow5.svg": "/static/media/arrow5.d78274682478e91e7543d798d1108443.svg",
     "static/media/menu.svg": "/static/media/menu.93e246810f5e2ed7cc697583986b0496.svg",
-    "main.f76508b7.css.map": "/static/css/main.f76508b7.css.map",
-    "main.7d4e1bbb.js.map": "/static/js/main.7d4e1bbb.js.map"
+    "main.fc8cf5ab.css.map": "/static/css/main.fc8cf5ab.css.map",
+    "main.bf11d32f.js.map": "/static/js/main.bf11d32f.js.map"
   },
   "entrypoints": [
-    "static/css/main.f76508b7.css",
-    "static/js/main.7d4e1bbb.js"
+    "static/css/main.fc8cf5ab.css",
+    "static/js/main.bf11d32f.js"
   ]
 }

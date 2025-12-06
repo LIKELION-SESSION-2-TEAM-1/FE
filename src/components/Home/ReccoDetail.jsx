@@ -9,15 +9,15 @@ const ReccoDetail = ({ className, onClose }) => {
     return (
         <div className={styles.reccoDetail}>
             <div>
-                <img src={arrow4} onClick={onClose} className={styles.arrow}/>
+                <img src={arrow4} onClick={onClose} className={styles.arrow} alt="close" />
                 <p className={styles.text1}>맞춤 여행지 추천</p>
-                <p className={styles.text2}>윤정님 연령대가 <br/>많이 찾은 곳</p>
+                <p className={styles.text2}>윤정님 연령대가 <br />많이 찾은 곳</p>
                 <div className={styles.box}>
-                    <img src={pic4} className={styles.pic4}/>
-                    <p className={styles.top}>top<br/>3</p>
+                    <img src={pic4} className={styles.pic4} alt="top 3 travel" />
+                    <p className={styles.top}>top<br />3</p>
                 </div>
-                <img src={pic5} className={styles.pic5}/>
-                <img src={pic6} className={styles.pic6}/>
+                <img src={pic5} className={styles.pic5} alt="recommendation 1" />
+                <img src={pic6} className={styles.pic6} alt="recommendation 2" />
             </div>
         </div>
     );
