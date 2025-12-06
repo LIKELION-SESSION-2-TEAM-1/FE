@@ -88,11 +88,73 @@ const ChatRoom = () => {
                 if (!room) room = await WSClient.createRoom("부산 여행");
                 setActiveRoom(room);
 
+<<<<<<< HEAD
+                const roomId = room?.roomId ?? room?.id ?? 0;
+                const data = await WSClient.fetchChats(roomId);
+                if (cancelled) return;
+                const arr = Array.isArray(data) ? data.slice() : [];
+                setMessages(arr);
+                scrollToBottom();
+            } catch (err) {
+                console.error("Bootstrap error:", err);
+                setError("채팅방 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
+            } finally {
+                if (!cancelled) setLoadingHistory(false);
+            }
+        };
+
+        bootstrap();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        const offOpen = ws.on("open", () => {
+            scrollToBottom();
+        });
+        const offMsg = ws.on("message", (msg) => {
+            const asObj = typeof msg === "string" ? { raw: msg } : msg;
+            const roomId = activeRoom?.roomId ?? activeRoom?.id ?? null;
+            if (roomId !== null && asObj?.chatRoomId !== undefined && asObj.chatRoomId !== roomId) {
+                return;
+            }
+            if (asObj?.messageType === "TALK" || asObj?.message) {
+                mergeMessages([asObj]);
+            }
+        });
+        const offErr = ws.on("error", () => { });
+        const offClose = ws.on("close", () => { });
+
+        ws.connect();
+
+        return () => {
+            offOpen();
+            offMsg();
+            offErr();
+            offClose();
+            ws.close();
+        };
+    }, [ws, activeRoom]);
+
+    useEffect(() => {
+        if (!activeRoom) return;
+        if (pollingRef.current) clearInterval(pollingRef.current);
+
+        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
+        const poll = async () => {
+            try {
+                const data = await WSClient.fetchChats(roomId);
+                if (Array.isArray(data)) {
+                    mergeMessages(data);
+=======
                 const roomId = room?.roomId ?? room?.id ?? 1;
                 
                 const history = await WSClient.fetchChats(roomId);
                 if (Array.isArray(history) && history.length) {
                     setMessages(history);
+>>>>>>> 124aaf6b95c0d5557f719d33444979aa0f122e89
                 }
 
                 ws.roomId = roomId;
@@ -123,6 +185,56 @@ const ChatRoom = () => {
     };
 
     const handleSend = () => {
+<<<<<<< HEAD
+        const trimmed = text.trim();
+        if (!trimmed) return;
+        if (!activeRoom) {
+            alert("채팅방 정보가 없습니다. 새로고침 해주세요.");
+            return;
+        }
+
+        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 0;
+        const clientTempId = `temp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        const talk = {
+            ...WSClient.buildTalkMessage({ text: trimmed, senderName: "뿡뻉", chatRoomId: roomId }),
+            clientTempId,
+        };
+
+        setText("");
+        setHasText(false);
+        inputRef.current?.focus();
+
+        // WS 전송 시도 및 낙관적 UI 업데이트
+        mergeMessages([talk]);
+        ws.send(talk);
+    };
+
+    return (
+        <div className={styles.chat__wrapper}>
+            <div className={styles.chat__container}>
+                <ChatHeader onBack={() => navigate('/chatlist')} />
+
+                {loadingHistory && (
+                    <div className={styles.loading}>채팅 내역을 불러오는 중...</div>
+                )}
+                {error && (
+                    <div className={styles.errorBanner}>{error}</div>
+                )}
+
+                <div className={styles.listWrapper}>
+                    <div className={styles.list} ref={listRef} aria-live="polite">
+                        {messages.map((m, idx) => (
+                            <div key={m.ts ? `${m.ts}-${idx}` : idx} className={styles.msgBox}>
+                                <div className={styles.meta}>
+                                    <span className={styles.name}>{m.senderName ?? 'unknown'}</span>
+                                    <span className={styles.time}>
+                                        {m.ts ? new Date(m.ts).toLocaleString() : ''}
+                                    </span>
+                                </div>
+                                <div className={styles.text}>{m.message ?? m.raw ?? ''}</div>
+                            </div>
+                        ))}
+=======
         if (!text.trim() || !activeRoom) return;
         const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 1;
         
@@ -206,6 +318,7 @@ const ChatRoom = () => {
                             {aiPlan?.title && <h4 className={styles.aiPlanTitle}>{aiPlan.title}</h4>}
                         </div>
                         {aiLoading && !aiPlan && <span className={styles.aiPlanBadge}>생성 중...</span>}
+>>>>>>> 124aaf6b95c0d5557f719d33444979aa0f122e89
                     </div>
                     {aiPlan?.description && (
                         <p className={styles.aiPlanDescription}>{aiPlan.description}</p>

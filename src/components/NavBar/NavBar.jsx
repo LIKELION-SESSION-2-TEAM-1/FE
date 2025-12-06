@@ -12,7 +12,7 @@ const MaskIcon = ({ src, alt, className }) => (
 
 const NavBar = () => {
     const { pathname } = useLocation();
-    const isHome = pathname === '/' || pathname.startsWith('/home');
+    const isHome = pathname.startsWith('/home');
     const isChat = pathname.startsWith('/chat');
     const isTrip = pathname.startsWith('/trip');
     const isMyPage = pathname.startsWith('/mypage');
@@ -20,7 +20,7 @@ const NavBar = () => {
     return (
         <div className={styles.navbar}>
             <div className={`${styles.wrapper} ${isChat ? styles.chatBackground : ''}`}>
-                <NavLink to="/" className={styles.link}>
+                <NavLink to="/home" className={styles.link}>
                     <div className={`${styles.icon_box} ${isHome ? styles.active : ''}`}>
                         <MaskIcon src={home} alt="Home" />
                         <span className={styles.icon_text}>Home</span>

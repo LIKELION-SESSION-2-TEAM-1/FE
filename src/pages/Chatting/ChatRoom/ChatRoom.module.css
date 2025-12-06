@@ -16,7 +16,8 @@
     z-index: 5;
     background: #f6f3ec;
     padding-top: 60px;
-    flex-shrink: 0; /* 크기 축소 방지 */
+    flex-shrink: 0;
+    /* 크기 축소 방지 */
 }
 
 .topBar {
@@ -39,6 +40,7 @@
     cursor: pointer;
     padding: 0;
 }
+
 .navBtn img {
     width: 16px;
     height: auto;
@@ -117,10 +119,10 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    
+
     /* [수정] 여기가 스크롤 되는 영역임을 명시 */
     overflow-y: auto;
-    
+
     /* 스크롤바 숨김 (선택사항) */
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -360,7 +362,8 @@
     justify-content: center;
     gap: 12px;
     background: #f6f3ec;
-    flex-shrink: 0; /* 크기 축소 방지 */
+    flex-shrink: 0;
+    /* 크기 축소 방지 */
 }
 
 .input {

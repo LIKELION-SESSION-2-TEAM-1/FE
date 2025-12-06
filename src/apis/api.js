@@ -1,3 +1,34 @@
+import axios from 'axios';
+
+// --- Axios Implementation for Login/Signup (Headers Access Required) ---
+const api = axios.create({
+    baseURL: 'https://port-0-bemaster-mild533144fe3281.sel3.cloudtype.app', // Keeping this as it was working/tested. If main uses tokplan, we might need to update this later.
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+export const signup = async (username, password) => {
+    try {
+        const response = await api.post('/api/user/signup', { username, password });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const login = async (username, password) => {
+    try {
+        const response = await api.post('/api/user/login', { username, password });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+export default api;
+
+
+// --- Fetch Implementation from Main (For other features) ---
 const API_BASE_URL = "https://port-0-tokplan-mild533144fe3281.sel3.cloudtype.app/";
 
 const buildUrl = (path = "", baseUrl = API_BASE_URL) => {
