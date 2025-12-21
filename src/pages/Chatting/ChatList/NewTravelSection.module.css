@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 48px;
     position: relative;
     overflow: hidden;
 }
@@ -277,4 +277,347 @@
     cursor: pointer;
     align-self: flex-end;
     margin-top: 8px;
+}
+
+/* --- Step 3: Room Creation --- */
+.creationCard {
+    width: 100%;
+    background-color: #FFF9D2;
+    border-radius: 24px;
+    padding: 40px 20px 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    min-height: 400px;
+}
+
+.profileUploader {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    cursor: pointer;
+}
+
+.imagePlaceholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #A7D7D9;
+    /* Fallback mockup color */
+}
+
+.defaultImageBg {
+    width: 100%;
+    height: 100%;
+    background: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60') center/cover;
+    opacity: 0.8;
+}
+
+.cameraBadgeIcon {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+}
+
+.inputContainer {
+    width: 100%;
+    max-width: 240px;
+    position: relative;
+    margin-top: 8px;
+}
+
+.roomNameInput {
+    width: 100%;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid #ccc;
+    padding: 8px 4px;
+    font-size: 16px;
+    text-align: center;
+    color: #333;
+    outline: none;
+}
+
+.roomNameInput:focus {
+    border-color: #E2481F;
+}
+
+.charCount {
+    position: absolute;
+    right: 0;
+    bottom: -20px;
+    font-size: 12px;
+    color: #999;
+}
+
+.inviteText {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+.inviteGrid {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+.inviteButton {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    background-color: #E2481F;
+    border-radius: 20px;
+    border: none;
+    padding: 0;
+    box-sizing: border-box;
+    color: #FFF;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(226, 72, 31, 0.2);
+    text-align: center;
+    white-space: nowrap;
+    letter-spacing: -0.5px;
+}
+
+.btnContent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Text vertically centered */
+    align-items: flex-start;
+    /* Text aligned left */
+    padding: 0 14px;
+    /* Left padding pushes text slightly to side */
+    box-sizing: border-box;
+}
+
+/* If the icon is inside btnContent, absolute positioning relative to inviteButton works if btnContent is static, 
+   or if we unwrap. Since we added a wrapper, let's target the icon inside. */
+.btnIcon {
+    position: absolute;
+    top: 14px;
+    left: 10px;
+    width: 18px;
+    /* User set to 18px previously */
+    height: 18px;
+    object-fit: contain;
+    margin: 0;
+}
+
+.bottomNav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    /* Reduced gap */
+}
+
+.backButton {
+    width: 100px;
+    height: 44px;
+    background-color: #CCC;
+    border-radius: 22px;
+    border: none;
+    color: #FFF;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.startButton {
+    width: 140px;
+    height: 44px;
+    background-color: #CCC;
+    /* Disabled state */
+    border-radius: 22px;
+    border: none;
+    color: #FFF;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: not-allowed;
+}
+
+/* --- Modal Styles --- */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    /* Align sheet to bottom */
+    justify-content: center;
+}
+
+.modalSheet {
+    width: 100%;
+    max-width: 480px;
+    /* Constrain on large screens */
+    min-height: 400px;
+    background-color: #FFF;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    padding: 24px;
+    box-sizing: border-box;
+    animation: slideUp 0.3s ease-out;
+    position: relative;
+    /* Simulate the 'card' look in screenshot if needed */
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modalTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+}
+
+.closeButton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.searchContainer {
+    position: relative;
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.searchInput {
+    width: 100%;
+    height: 44px;
+    border: 1.5px solid #E2481F;
+    /* Orange border */
+    border-radius: 22px;
+    padding: 0 44px 0 16px;
+    /* Space for icon */
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    font-weight: 500;
+    color: #333;
+}
+
+.searchIcon {
+    position: absolute;
+    right: 16px;
+    top: 12px;
+    /* Center in 44px height */
+    width: 20px;
+    height: 20px;
+}
+
+.resultList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.userItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.userAvatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #eee;
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.userName {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+}
+
+.userId {
+    font-size: 12px;
+    color: #666;
+}
+
+.addButton {
+    margin-left: auto;
+    /* Push to right */
+    background-color: #E2481F;
+    color: #FFF;
+    border: none;
+    border-radius: 14px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* --- Entry Step (Step 0) --- */
+.entryButton {
+    width: 100%;
+    height: 60px;
+    background-color: #FFF9D2;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.entryButton:hover {
+    background-color: #ffeeb0;
+}
+
+.entryText {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+}
+
+.entryAction {
+    font-size: 14px;
+    color: #333;
+    font-weight: 700;
 }
