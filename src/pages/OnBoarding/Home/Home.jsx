@@ -55,7 +55,7 @@ const Home = () => {
                     </div>
                     <img src={pic} alt="" className={styles.card__pic} />
 
-                    <NavLink to='/chat' className={styles.item}>
+                    <NavLink to='/chatlist' className={styles.item}>
                         <div className={styles.card__button}>
                             <p className={styles.card__text3}>새로운 여행계획 시작하기</p>
                             <img src={arrow} alt="" className={styles.card__arrow} />

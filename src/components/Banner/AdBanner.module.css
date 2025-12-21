@@ -1,0 +1,49 @@
+.bannerCard {
+    width: 352px;
+    height: 92px;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    padding: 10px 14px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: none;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.bannerText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: #0f0f0f;
+}
+
+.bannerTitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.bannerSubtitle {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.bannerBrand {
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.bannerImage {
+    width: 143px;
+    height: 90px;
+    object-fit: contain;
+    border-radius: 4px;
+}
