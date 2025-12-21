@@ -1,0 +1,132 @@
+.calendarWrapper {
+    width: 100%;
+    padding: 0 4px;
+    /* Reduced side padding to widen grid area */
+    box-sizing: border-box;
+}
+
+.monthTitle {
+    width: 100%;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+    /* Reduced from 20px */
+    padding-left: 8px;
+}
+
+.calendarGrid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 4px;
+    /* Significantly reduced from 16px to tighten height */
+    column-gap: 0px;
+    text-align: center;
+}
+
+.dayName {
+    font-size: 14px;
+    font-weight: 500;
+    color: #777;
+    margin-bottom: 8px;
+}
+
+.dateCell {
+    font-size: 15px;
+    color: #333;
+    width: 34px;
+    /* Slightly wider */
+    height: 34px;
+    /* Matches width */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    cursor: pointer;
+    border-radius: 50%;
+    /* Default circle */
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+}
+
+/* Range styles */
+/* Range styles */
+.dateCell.rangeStart,
+.dateCell.rangeEnd {
+    color: #333;
+    font-weight: 700;
+    background-color: transparent;
+    border: none;
+    /* Border moved to ::after */
+    position: relative;
+    z-index: 10;
+    border-radius: 50%;
+}
+
+/* The White Circle + Orange Border (Visual "Cell") */
+.dateCell.rangeStart::after,
+.dateCell.rangeEnd::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1.5px solid #E2481F;
+    border-radius: 50%;
+    background-color: #FFFFFF;
+    z-index: -1;
+    /* Sits behind text, but above the strip */
+    box-sizing: border-box;
+}
+
+/* Connecting strip for Start (Sits behind the circle) */
+.dateCell.rangeStart::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 60%;
+    /* Go slightly over center to avoid gaps */
+    background-color: #F8E8B0;
+    z-index: -2;
+    /* Lowest layer */
+}
+
+/* Connecting strip for End (Sits behind the circle) */
+.dateCell.rangeEnd::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 60%;
+    background-color: #F8E8B0;
+    z-index: -2;
+    /* Lowest layer */
+}
+
+/* Background strip for the range (middle cells) */
+.dateCell.rangeBetween {
+    background-color: #F8E8B0;
+    color: #333;
+    border-radius: 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+}
+
+.multiSelected {
+    border: 1.5px solid #28C2CE;
+    color: #333;
+    font-weight: 700;
+    border-radius: 50%;
+}
+
+.emptyCell {
+    cursor: default;
+}
