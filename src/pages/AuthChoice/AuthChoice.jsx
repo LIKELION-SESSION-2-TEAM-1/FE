@@ -6,12 +6,14 @@ import kakao from '../../assets/oauth/카톡.png';
 import naver from '../../assets/oauth/네이버.png';
 import google from '../../assets/oauth/구글.png';
 import StartButton from '../../components/Landing/StartButton';
+import Snow from '../../components/Landing/Snow';
 
 const AuthChoice = () => {
     return (
         <div className={styles.container}>
             {/* 배경 패턴 및 로고 */}
             <BackgroundPattern />
+            <Snow />
 
             <img src={logo} alt="TokPlan Logo" className={styles.logo} />
 

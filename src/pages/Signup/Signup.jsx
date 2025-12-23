@@ -7,6 +7,7 @@ import arrow from '../../assets/pic/arrow.svg';
 import { signup } from '../../apis/api';
 
 import Loading from '../../components/Loading/Loading';
+import Snow from '../../components/Landing/Snow';
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -78,6 +79,7 @@ const Signup = () => {
             {isLoading && <Loading />}
             <BackgroundPattern />
 
+            <Snow />
 
             <h2 className={styles.title}>회원가입</h2>
 
