@@ -1,0 +1,185 @@
+.container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #FFF;
+    padding: 0 0 80px 0;
+    /* Box sizing border-box handled globally? usually. */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    margin-left: -8px;
+    /* Align icon visually with padding */
+}
+
+/* --- Profile --- */
+.profileSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0 32px 0;
+}
+
+.profileImageWrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 16px;
+}
+
+.profileImage {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.cameraBadge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+}
+
+.userName {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 4px 0;
+}
+
+.editProfileLink {
+    font-size: 14px;
+    color: #4FB6BA;
+    /* Cyan/Teal color from image */
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* --- Divider --- */
+.divider {
+    width: 100%;
+    height: 1px;
+    background-color: #EEE;
+    /* Light gray line */
+    margin: 0;
+}
+
+/* --- Section --- */
+.section {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sectionTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+}
+
+.userId {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.birthDateContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.fieldLabel {
+    font-size: 14px;
+    color: #666;
+}
+
+.dateInputs {
+    display: flex;
+    gap: 8px;
+}
+
+.dateBox {
+    border: 1px solid #111;
+    /* Dark border as shown */
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #111;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* --- Menu Items --- */
+.menuItem {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.menuContent {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.menuTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+}
+
+.menuDesc {
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+}
+
+.chevron {
+    font-size: 18px;
+    color: #AAA;
+    font-weight: 300;
+}
+
+/* --- Delete Account --- */
+.deleteAccountContainer {
+    padding: 24px;
+    margin-top: auto;
+    /* Push to where? Or just flow */
+}
+
+.deleteAccountButton {
+    background: none;
+    border: none;
+    color: #E2481F;
+    /* Reddish orange */
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}

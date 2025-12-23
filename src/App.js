@@ -15,16 +15,18 @@ import Login from './pages/Login/Login';
 
 import Dogeja from './pages/Dogeja/Dogeja';
 import Search from './pages/Search/Search';
+import MyPage from './pages/MyPage/MyPage';
+import TripStyleEdit from './pages/MyPage/TripStyleEdit';
 
 function App() {
     const { pathname } = useLocation();
-    // Merge hideHeader conditions: chatlist, chatroom, landing(/), start page, login page, dogeja page
-    const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/' || pathname === '/start' || pathname === '/dogeja';
+    // Merge hideHeader conditions: chatlist, chatroom, landing(/), start page, login page, dogeja page, mypage, edit-style
+    const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/' || pathname === '/start' || pathname === '/dogeja' || pathname === '/mypage' || pathname === '/mypage/edit-style';
     const isChatRoom = pathname === '/chatroom';
 
-    // Merge hideNav conditions: dogeja page, landing(/), start, login, signup
+    // Merge hideNav conditions: dogeja page, landing(/), start, login, signup, mypage, edit-style
     // Note: Incoming changed hideNav logic to use variable. We will combine them.
-    const hideNav = pathname === '/dogeja' || pathname === '/' || pathname === '/start' || pathname === '/login' || pathname === '/signup';
+    const hideNav = pathname === '/dogeja' || pathname === '/' || pathname === '/start' || pathname === '/login' || pathname === '/signup' || pathname === '/mypage' || pathname === '/mypage/edit-style';
 
     return (
         <div className={frame.appShell}>
@@ -46,6 +48,8 @@ function App() {
                         {/* New Routes from Main */}
                         <Route path="/dogeja" element={<Dogeja />} />
                         <Route path="/search" element={<Search />} />
+                        <Route path="/mypage" element={<MyPage />} />
+                        <Route path="/mypage/edit-style" element={<TripStyleEdit />} />
                     </Routes>
                 </div>
                 {!isChatRoom && !hideNav && <NavBar />}

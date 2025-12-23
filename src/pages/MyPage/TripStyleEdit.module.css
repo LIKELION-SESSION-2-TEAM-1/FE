@@ -1,0 +1,189 @@
+.container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #F8F9FA;
+    padding: 0 0 80px 0;
+    /* Reduced bottom padding */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    /* Prevent horizontal scrolling */
+    overflow-x: hidden;
+    position: relative;
+    max-width: 100%;
+}
+
+/* Header */
+.header {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    background-color: #FFF;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-sizing: border-box;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    margin-right: 4px;
+    margin-left: -8px;
+}
+
+.pageTitle {
+    font-size: 20px;
+    font-weight: 800;
+    color: #111;
+}
+
+/* Content */
+.content {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    /* Reduced gap between sections */
+    box-sizing: border-box;
+}
+
+.description {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.5;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+/* Sections */
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sectionHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sectionTitle {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111;
+}
+
+.sectionSubtitle {
+    font-size: 13px;
+    color: #888;
+    font-weight: 400;
+}
+
+/* Scrollable Options */
+.optionGroup {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding: 8px 4px 16px 4px;
+    margin: 0 -4px;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.optionGroup::-webkit-scrollbar {
+    display: none;
+}
+
+/* Pills */
+.optionPill {
+    flex-shrink: 0;
+    background-color: #FFF;
+    border: 1.2px solid transparent;
+    /* Transparent border reserved */
+    border-radius: 20px;
+    padding: 8px 16px;
+    /* Tighter padding to fit text */
+    font-size: 14px;
+    /* Slightly smaller text */
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    /* Adjusted shadow */
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.optionPill.selected {
+    background-color: #EFFCFD;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(106, 199, 203, 0.2);
+    border: 1.2px solid #89D5D8;
+}
+
+
+/* Sub Labels */
+.subLabel {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+/* Footer Note */
+.footerNote {
+    font-size: 12px;
+    color: #888;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+/* Submit Button */
+.submitButtonContainer {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 393px;
+    display: flex;
+    justify-content: center;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.submitButton {
+    pointer-events: auto;
+    width: calc(100% - 40px);
+    max-width: 380px;
+    height: 56px;
+    background-color: #E2481F;
+    border-radius: 28px;
+    border: none;
+    color: #FFF;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* Spread content */
+    padding: 0 32px;
+    /* Inner spacing */
+    box-shadow: 0 8px 20px rgba(226, 72, 31, 0.3);
+}
+
+.arrowIcon {
+    margin-left: 4px;
+    stroke: #FFF;
+}
