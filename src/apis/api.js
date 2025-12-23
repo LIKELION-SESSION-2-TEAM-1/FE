@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // --- Axios Implementation for Login/Signup (Headers Access Required) ---
 const api = axios.create({
-    baseURL: 'https://port-0-bemaster-mild533144fe3281.sel3.cloudtype.app', // Keeping this as it was working/tested. If main uses tokplan, we might need to update this later.
+    baseURL: 'https://port-0-beeee-mjfnlzve18281716.sel3.cloudtype.app', // Updated base URL
     headers: {
         'Content-Type': 'application/json',
     },
@@ -29,7 +29,7 @@ export default api;
 
 
 // --- Fetch Implementation from Main (For other features) ---
-const API_BASE_URL = "https://port-0-tokplan-mild533144fe3281.sel3.cloudtype.app/";
+const API_BASE_URL = "https://port-0-beeee-mjfnlzve18281716.sel3.cloudtype.app/";
 
 const buildUrl = (path = "", baseUrl = API_BASE_URL) => {
     if (!path) return baseUrl;

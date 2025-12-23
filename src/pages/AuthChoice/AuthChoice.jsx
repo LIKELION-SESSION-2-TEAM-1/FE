@@ -7,8 +7,13 @@ import naver from '../../assets/oauth/네이버.png';
 import google from '../../assets/oauth/구글.png';
 import StartButton from '../../components/Landing/StartButton';
 import Snow from '../../components/Landing/Snow';
+import { API_BASE_URL } from '../../apis/api';
 
 const AuthChoice = () => {
+    const handleSocialLogin = (provider) => {
+        window.location.href = `${API_BASE_URL}oauth2/authorization/${provider}`;
+    };
+
     return (
         <div className={styles.container}>
             {/* 배경 패턴 및 로고 */}
@@ -36,13 +41,25 @@ const AuthChoice = () => {
 
                 {/* 소셜 로그인 버튼 */}
                 <div className={styles.socialGroup}>
-                    <button className={styles.socialBtn} style={{ backgroundColor: '#FEE500' }}>
+                    <button
+                        className={styles.socialBtn}
+                        style={{ backgroundColor: '#FEE500' }}
+                        onClick={() => handleSocialLogin('kakao')}
+                    >
                         <img src={kakao} alt="Kakao" />
                     </button>
-                    <button className={styles.socialBtn} style={{ backgroundColor: '#03C75A' }}>
+                    <button
+                        className={styles.socialBtn}
+                        style={{ backgroundColor: '#03C75A' }}
+                        onClick={() => handleSocialLogin('naver')}
+                    >
                         <img src={naver} alt="Naver" />
                     </button>
-                    <button className={styles.socialBtn} style={{ backgroundColor: '#FFFFFF' }}>
+                    <button
+                        className={styles.socialBtn}
+                        style={{ backgroundColor: '#FFFFFF' }}
+                        onClick={() => handleSocialLogin('google')}
+                    >
                         <img src={google} alt="Google" />
                     </button>
                 </div>
