@@ -1,6 +1,6 @@
 import styles from './ChatRoom.module.css';
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import WSClient from '../../../websocket/WebSocket';
 import { fetchAiKeywords, fetchAiPlan } from '../../../apis/aiApi';
 import sendIcon from "../../../assets/pic/send.svg";
@@ -17,6 +17,7 @@ const keyOf = (m) =>
 
 const ChatRoom = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const [activeRoom, setActiveRoom] = useState(null);
@@ -97,22 +98,43 @@ const ChatRoom = () => {
     useEffect(() => {
         const init = async () => {
             try {
-                const rooms = await WSClient.fetchRooms();
-                let room = Array.isArray(rooms) && rooms.length ? rooms[0] : null;
-                if (!room) room = await WSClient.createRoom("부산 여행");
-                setActiveRoom(room);
+                // 1. 네비게이션으로 전달된 방 ID 확인
+                let roomId = location.state?.roomId;
+                let room = null;
 
-                const roomId = room?.roomId ?? room?.id ?? 1;
-
-                const history = await WSClient.fetchChats(roomId);
-                if (Array.isArray(history) && history.length) {
-                    setMessages(history);
+                // 2. 전달된 ID가 없으면 목록 조회 후 첫 번째 방 선택 (임시 로직)
+                if (!roomId) {
+                    const rooms = await WSClient.fetchRooms();
+                    if (Array.isArray(rooms) && rooms.length > 0) {
+                        // 사용자가 참여 중인 방 중 첫 번째 방을 선택
+                        room = rooms[0];
+                        roomId = room.roomId || room.room_id || room.id;
+                    } else {
+                        // 방이 아예 없으면 생성하지 않고 대기하거나 알림
+                        console.log("참여 중인 채팅방이 없습니다.");
+                        setIsLoading(false);
+                        return;
+                    }
+                } else {
+                    // ID가 있으면 (추가 구현 필요: 방 정보 단건 조회 API가 있다면 호출)
+                    // 현재는 목록에서 찾거나 기본값 사용
+                    const rooms = await WSClient.fetchRooms();
+                    room = rooms.find(r => (r.roomId || r.id) === roomId);
                 }
 
-                ws.roomId = roomId;
-                ws.connect({
-                    onMessage: (msg) => handleReceive(msg, roomId),
-                });
+                if (roomId) {
+                    setActiveRoom(room || { roomId, name: '채팅방' });
+
+                    const history = await WSClient.fetchChats(roomId);
+                    if (Array.isArray(history) && history.length) {
+                        setMessages(history);
+                    }
+
+                    ws.roomId = roomId;
+                    ws.connect({
+                        onMessage: (msg) => handleReceive(msg, roomId),
+                    });
+                }
             } catch (e) {
                 console.error(e);
             } finally {
@@ -121,15 +143,11 @@ const ChatRoom = () => {
         };
         init();
         return () => ws.disconnect();
-    }, [ws, handleReceive]);
-
-
-
-
+    }, [ws, handleReceive, location.state]);
 
     const handleSend = () => {
         if (!text.trim() || !activeRoom) return;
-        const roomId = activeRoom?.roomId ?? activeRoom?.id ?? 1;
+        const roomId = activeRoom.roomId ?? activeRoom.id;
 
         let payload = WSClient.buildTalkMessage({
             text,
@@ -269,7 +287,7 @@ const ChatRoom = () => {
                         <img src={backIcon} alt="back" />
                     </button>
                     <div className={styles.titleGroup}>
-                        <h1 className={styles.title}>부산 여행</h1>
+                        <h1 className={styles.title}>{activeRoom?.name || "채팅방"}</h1>
                         <span className={styles.memberCount}>6</span>
                     </div>
                     <div className={styles.topIcons}>
