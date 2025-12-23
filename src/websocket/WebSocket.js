@@ -1,7 +1,7 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-export const API_BASE_URL = "https://port-0-tokplan-mild533144fe3281.sel3.cloudtype.app/";
+export const API_BASE_URL = "https://port-0-beeee-mjfnlzve18281716.sel3.cloudtype.app/";
 
 // 백엔드 STOMP 전용 엔드포인트 및 pub/sub 경로
 const WS_ENDPOINT = `${API_BASE_URL.replace(/\/$/, "")}/stomp-ws`;
@@ -39,7 +39,7 @@ export default class WSClient {
             reconnectDelay: this.reconnectDelay,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
-            
+
             onConnect: (frame) => {
                 console.log('[WS] Connected');
                 this.connected = true;
@@ -47,7 +47,7 @@ export default class WSClient {
                 if (this.onConnect) this.onConnect(frame);
                 this._emit("open");
             },
-            
+
             onStompError: (frame) => {
                 console.error('[WS] Broker reported error: ' + frame.headers['message']);
                 console.error('[WS] Additional details: ' + frame.body);
