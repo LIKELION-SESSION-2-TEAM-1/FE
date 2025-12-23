@@ -8,6 +8,7 @@ import arrow from '../../assets/pic/arrow.svg';
 import { login } from '../../apis/api';
 
 import Loading from '../../components/Loading/Loading';
+import Snow from '../../components/Landing/Snow';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -70,6 +71,7 @@ const Login = () => {
         <div className={styles.container}>
             {isLoading && <Loading />}
             <BackgroundPattern />
+            <Snow />
 
             <h2 className={styles.title}>로그인</h2>
 
