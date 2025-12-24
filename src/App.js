@@ -1,6 +1,8 @@
 import './assets/css/styles.module.css';
 import frame from './AppFrame.module.css';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import useAuthStore from './stores/useAuthStore';
 
 import Header from './components/Header/Header.jsx'
 import NavBar from './components/NavBar/NavBar.jsx'
@@ -19,7 +21,30 @@ import MyPage from './pages/MyPage/MyPage';
 import TripStyleEdit from './pages/MyPage/TripStyleEdit';
 
 function App() {
-    const { pathname } = useLocation();
+    const { pathname, search } = useLocation();
+    const navigate = useNavigate();
+
+    // Global OAuth Token Handling
+    useEffect(() => {
+        const params = new URLSearchParams(search);
+        const tokenFromUrl = params.get('token');
+
+        if (tokenFromUrl) {
+            console.log("Global Token Handler: Found token in URL");
+            const accessToken = tokenFromUrl.startsWith('Bearer ')
+                ? tokenFromUrl
+                : `Bearer ${tokenFromUrl}`;
+
+            // Save to LocalStorage
+            localStorage.setItem('accessToken', accessToken);
+
+            // Save to Auth Store
+            useAuthStore.getState().login(accessToken, 'Social User');
+
+            // Remove token from URL but stay on the same page
+            navigate(pathname, { replace: true });
+        }
+    }, [search, pathname, navigate]);
     // Merge hideHeader conditions: chatlist, chatroom, landing(/), start page, login page, dogeja page, mypage, edit-style
     const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/' || pathname === '/start' || pathname === '/dogeja' || pathname === '/mypage' || pathname === '/mypage/edit-style';
     const isChatRoom = pathname === '/chatroom';
