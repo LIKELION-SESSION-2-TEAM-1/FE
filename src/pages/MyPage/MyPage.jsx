@@ -17,8 +17,19 @@ const MyPage = () => {
     // Hooks must be unconditional. Effects too.
     useEffect(() => {
         const fetchProfile = async () => {
-            const token = localStorage.getItem('accessToken');
+            // Race condition fix: Check URL first if localStorage is empty
+            const params = new URLSearchParams(window.location.search);
+            const urlToken = params.get('token');
+            let token = localStorage.getItem('accessToken');
+
+            if (!token && urlToken) {
+                console.log("MyPage: Found token in URL fallback");
+                token = urlToken.startsWith('Bearer ') ? urlToken : `Bearer ${urlToken}`;
+                localStorage.setItem('accessToken', token);
+            }
+
             if (!token) {
+                console.warn("MyPage: No token found in localStorage or URL");
                 alert("로그인이 필요합니다.");
                 navigate('/login');
                 return;

@@ -19,27 +19,7 @@ const Home = () => {
     const [isReccoExpanded, setIsReccoExpanded] = useState(false);
     const [isPopularExpanded, setIsPopularExpanded] = useState(false);
 
-    // OAuth Token Handling on Home Landing
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const tokenFromUrl = params.get('token');
 
-        if (tokenFromUrl) {
-            console.log("Found token in Home URL:", tokenFromUrl);
-            const accessToken = tokenFromUrl.startsWith('Bearer ')
-                ? tokenFromUrl
-                : `Bearer ${tokenFromUrl}`;
-
-            // Save to LocalStorage
-            localStorage.setItem('accessToken', accessToken);
-
-            // Save to Auth Store
-            useAuthStore.getState().login(accessToken, 'Social User');
-
-            // Clean URL (remove token param)
-            navigate('/home', { replace: true });
-        }
-    }, [location, navigate]);
 
     const handleReccoToggle = () => {
         setIsReccoExpanded(prev => !prev);
