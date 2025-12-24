@@ -1,13 +1,97 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MyPage.module.css';
+import { getProfile, updateProfile } from '../../apis/api';
 
 // Assets
-import profileImg from '../../assets/pic/dogeja_cat1.png'; // Mock profile
-import iconCamera from '../../assets/pic/채팅방/사진선택.png'; // Reusing camera icon
+import profileImg from '../../assets/pic/dogeja_cat1.png'; // Fallback or user image
+import iconCamera from '../../assets/pic/채팅방/사진선택.png';
 
 const MyPage = () => {
     const navigate = useNavigate();
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editData, setEditData] = useState({});
+
+    // Hooks must be unconditional. Effects too.
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                navigate('/login');
+                return;
+            }
+
+            try {
+                const data = await getProfile();
+                console.log('Profile Data Loaded:', data);
+                setProfile(data);
+            } catch (error) {
+                console.error("Failed to load profile", error);
+                if (error.response && error.response.status === 401) {
+                    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                    localStorage.removeItem('accessToken');
+                    navigate('/login');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, [navigate]);
+
+    // Derived state (safe to compute every render)
+    const birthDateParts = profile?.birthDate ? profile.birthDate.split('-') : ['YYYY', 'MM', 'DD'];
+
+    // Toggle Edit Mode
+    const handleEditToggle = async () => {
+        if (isEditing) {
+            // Save changes
+            try {
+                // 생년월일 조합 (YYYY-MM-DD)
+                const fullBirthDate = `${editData.year || birthDateParts[0]}-${editData.month || birthDateParts[1]}-${editData.day || birthDateParts[2]}`;
+
+                // 부분 수정 지원: 변경할 필드만 전송
+                const payload = {
+                    nickname: editData.nickname,
+                    birthDate: fullBirthDate
+                };
+
+                await updateProfile(payload);
+                // 로컬 profile 상태도 부분 업데이트
+                setProfile(prev => ({ ...prev, ...payload }));
+                setIsEditing(false);
+                alert("회원 정보가 수정되었습니다.");
+            } catch (error) {
+                console.error("Failed to update profile", error);
+                if (error.response && error.response.status === 401) {
+                    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                    localStorage.removeItem('accessToken');
+                    navigate('/login');
+                    return;
+                }
+                alert("수정에 실패했습니다.");
+            }
+        } else {
+            // Enter Edit Mode
+            setEditData({
+                nickname: profile?.nickname || profile?.username || "",
+                year: birthDateParts[0] !== 'YYYY' ? birthDateParts[0] : '',
+                month: birthDateParts[1] !== 'MM' ? birthDateParts[1] : '',
+                day: birthDateParts[2] !== 'DD' ? birthDateParts[2] : ''
+            });
+            setIsEditing(true);
+        }
+    };
+
+    const handleEditChange = (e) => {
+        const { name, value } = e.target;
+        setEditData(prev => ({ ...prev, [name]: value }));
+    };
+
+    if (loading) return <div className={styles.container}>Loading...</div>;
 
     return (
         <div className={styles.container}>
@@ -24,11 +108,27 @@ const MyPage = () => {
             {/* Profile Section */}
             <div className={styles.profileSection}>
                 <div className={styles.profileImageWrapper}>
-                    <img src={profileImg} alt="Profile" className={styles.profileImage} />
+                    <img src={profile?.profileImageUrl || profileImg} alt="Profile" className={styles.profileImage} />
                     <img src={iconCamera} alt="Edit" className={styles.cameraBadge} />
                 </div>
-                <h2 className={styles.userName}>민수</h2>
-                <span className={styles.editProfileLink}>수정</span>
+
+                {isEditing ? (
+                    <input
+                        type="text"
+                        name="nickname"
+                        value={editData.nickname}
+                        onChange={handleEditChange}
+                        className={styles.editInput}
+                        placeholder="닉네임"
+                        style={{ fontSize: '20px', fontWeight: '700', textAlign: 'center', border: '1px solid #ddd', padding: '4px', borderRadius: '8px', marginBottom: '4px' }}
+                    />
+                ) : (
+                    <h2 className={styles.userName}>{profile?.nickname || profile?.username || "User"}</h2>
+                )}
+
+                <span className={styles.editProfileLink} onClick={handleEditToggle}>
+                    {isEditing ? "완료" : "수정"}
+                </span>
             </div>
 
             <div className={styles.divider} />
@@ -36,14 +136,33 @@ const MyPage = () => {
             {/* Member Info Section */}
             <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>회원 정보</h3>
-                <p className={styles.userId}>아이디: likelion12</p>
+                <p className={styles.userId}>아이디: {profile?.username || "unknown"}</p>
 
                 <div className={styles.birthDateContainer}>
                     <span className={styles.fieldLabel}>생년월일</span>
                     <div className={styles.dateInputs}>
-                        <div className={styles.dateBox}>2002</div>
-                        <div className={styles.dateBox}>11</div>
-                        <div className={styles.dateBox}>20</div>
+                        {isEditing ? (
+                            <>
+                                <input
+                                    type="text" name="year" value={editData.year} onChange={handleEditChange} placeholder="YYYY"
+                                    className={styles.dateBox} style={{ width: '60px', textAlign: 'center' }}
+                                />
+                                <input
+                                    type="text" name="month" value={editData.month} onChange={handleEditChange} placeholder="MM"
+                                    className={styles.dateBox} style={{ width: '40px', textAlign: 'center' }}
+                                />
+                                <input
+                                    type="text" name="day" value={editData.day} onChange={handleEditChange} placeholder="DD"
+                                    className={styles.dateBox} style={{ width: '40px', textAlign: 'center' }}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <div className={styles.dateBox}>{birthDateParts[0]}</div>
+                                <div className={styles.dateBox}>{birthDateParts[1]}</div>
+                                <div className={styles.dateBox}>{birthDateParts[2]}</div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

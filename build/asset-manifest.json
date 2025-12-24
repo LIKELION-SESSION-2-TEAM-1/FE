@@ -1,13 +1,18 @@
 {
   "files": {
-    "main.css": "/static/css/main.fc8cf5ab.css",
-    "main.js": "/static/js/main.bf11d32f.js",
+    "main.css": "/static/css/main.a91dcb59.css",
+    "main.js": "/static/js/main.51ca4379.js",
     "static/media/sinan_salt.png": "/static/media/sinan_salt.398c89adb498cb2c03e6.png",
+    "static/media/체험엑티비티.png": "/static/media/체험엑티비티.d36ac355b775de9d40be.png",
+    "static/media/관광보단먹방.png": "/static/media/관광보단먹방.3c1644d016f4fc5b6698.png",
     "static/media/pic3.png": "/static/media/pic3.a724215e37ea4eb21576.png",
     "static/media/dogeja_cat2.png": "/static/media/dogeja_cat2.35edf370e2c6ef1433ec.png",
     "static/media/dogeja_cat1.png": "/static/media/dogeja_cat1.f4ebdc87c677446f7fe6.png",
+    "static/media/유명관광지는필수.png": "/static/media/유명관광지는필수.4211aab6f80d4dfdf6a6.png",
     "static/media/pic1.png": "/static/media/pic1.31f1197f395c976989f9.png",
+    "static/media/쇼핑은열정적으로.png": "/static/media/쇼핑은열정적으로.2ae52be9876f3b67af7d.png",
     "static/media/pic4.png": "/static/media/pic4.a9426694b03e66535109.png",
+    "static/media/문화예술역사.png": "/static/media/문화예술역사.d4913d3f8a354bd9b573.png",
     "static/media/pic2.png": "/static/media/pic2.8be7114886bd0a76864c.png",
     "static/media/pic6.png": "/static/media/pic6.25b33ecef2c562a2dcb9.png",
     "static/media/pic5.png": "/static/media/pic5.d6121b9f91be0ad14d7c.png",
@@ -26,11 +31,11 @@
     "static/media/arrow4.svg": "/static/media/arrow4.9c96816ba1f54f92dd4d25abaaa5cd20.svg",
     "static/media/arrow5.svg": "/static/media/arrow5.d78274682478e91e7543d798d1108443.svg",
     "static/media/menu.svg": "/static/media/menu.93e246810f5e2ed7cc697583986b0496.svg",
-    "main.fc8cf5ab.css.map": "/static/css/main.fc8cf5ab.css.map",
-    "main.bf11d32f.js.map": "/static/js/main.bf11d32f.js.map"
+    "main.a91dcb59.css.map": "/static/css/main.a91dcb59.css.map",
+    "main.51ca4379.js.map": "/static/js/main.51ca4379.js.map"
   },
   "entrypoints": [
-    "static/css/main.fc8cf5ab.css",
-    "static/js/main.bf11d32f.js"
+    "static/css/main.a91dcb59.css",
+    "static/js/main.51ca4379.js"
   ]
 }

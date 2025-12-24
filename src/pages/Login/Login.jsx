@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import styles from './Login.module.css';
 import useAuthStore from '../../stores/useAuthStore';
@@ -12,12 +12,32 @@ import Snow from '../../components/Landing/Snow';
 
 const Login = () => {
     const navigate = useNavigate();
+    const location = useLocation(); // To parse query params for OAuth
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         username: '',
         password: ''
     });
     const [showPassword, setShowPassword] = useState(false);
+
+    // OAuth Redirect Handling
+    // Google/Kakao login redirects to: /login?token=<pure_jwt>
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const tokenFromUrl = params.get('token');
+
+        if (tokenFromUrl) {
+            console.log("OAuth Token found in URL:", tokenFromUrl);
+            // User instruction: OAuth token is pure JWT, so we must add 'Bearer ' prefix when saving.
+            const accessToken = `Bearer ${tokenFromUrl}`;
+
+            localStorage.setItem('accessToken', accessToken);
+            useAuthStore.getState().login(accessToken, 'Social User'); // We might not have username yet
+
+            // Navigate to home to clear URL params
+            navigate('/home', { replace: true });
+        }
+    }, [location, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
