@@ -156,7 +156,17 @@ export default class WSClient {
 
     static async fetchRooms() {
         try {
-            const res = await fetch(`${API_BASE_URL}api/chats/rooms`);
+            const token = sessionStorage.getItem('token') || localStorage.getItem('accessToken');
+            const headers = {
+                "Content-Type": "application/json"
+            };
+            if (token) {
+                headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+            }
+
+            const res = await fetch(`${API_BASE_URL}api/chats/rooms`, {
+                headers: headers
+            });
             if (!res.ok) throw new Error("Failed to fetch rooms");
             return await res.json();
         } catch (e) {
@@ -182,7 +192,17 @@ export default class WSClient {
 
     static async fetchChats(chatRoomId) {
         try {
-            const res = await fetch(`${API_BASE_URL}api/chats/${chatRoomId}`);
+            const token = sessionStorage.getItem('token') || localStorage.getItem('accessToken');
+            const headers = {
+                "Content-Type": "application/json"
+            };
+            if (token) {
+                headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+            }
+
+            const res = await fetch(`${API_BASE_URL}api/chats/${chatRoomId}`, {
+                headers: headers
+            });
             if (!res.ok) throw new Error("Failed to fetch chats");
             return await res.json();
         } catch (e) {

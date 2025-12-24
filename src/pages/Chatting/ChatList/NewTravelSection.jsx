@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './NewTravelSection.module.css';
+import { createChatRoom, addMember } from '../../../apis/chatApi';
 import DateSelectionStep from './DateSelectionStep';
 import StyleSelectionStep from './StyleSelectionStep';
 import RoomCreationStep from './RoomCreationStep';
@@ -26,8 +27,18 @@ const NewTravelSection = ({ onWizardStateChange }) => {
 
     // Step 3 State
     const [roomName, setRoomName] = useState("");
+    const [invitedMemberIds, setInvitedMemberIds] = useState([]); // [추가] 초대할 멤버 ID 목록
 
     // --- Handlers ---
+    const handleAddMember = (identifier) => {
+        if (!invitedMemberIds.includes(identifier)) {
+            setInvitedMemberIds([...invitedMemberIds, identifier]);
+            alert(`${identifier}님이 초대 목록에 추가되었습니다.`);
+        } else {
+            alert("이미 추가된 멤버입니다.");
+        }
+    };
+
     const handleStartWizard = (targetStep, tab = 'date') => {
         if (targetStep === 1) {
             setSelectedTab(tab);
@@ -78,27 +89,63 @@ const NewTravelSection = ({ onWizardStateChange }) => {
         setStep(2);
     };
 
-    const handleBackToEntry = () => {
-        setStep(0);
-        // Reset state? Optional.
-        setStartDate(null);
-        setEndDate(null);
-        setSelectedDates([]);
-        setSelectedStyleId(null);
-        setRoomName("");
-    }
 
-    const handleStartChat = () => {
-        console.log("FINAL SUBMIT: Starting Chat", {
-            type: selectedTab,
-            dates: selectedTab === 'date' ? { start: startDate, end: endDate } : selectedDates,
-            style: selectedStyleId,
-            roomName: roomName
-        });
-        // Reset to entry (Simulate navigation "Back to list")
-        setStep(0);
 
-        // In real app, we would append to ParticipatingChats list here.
+    const handleStartChat = async () => {
+        try {
+            // 날짜 포맷팅 (YYYY-MM-DD)
+            const formatDate = (date) => {
+                if (!date) return null;
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const dd = String(date.getDate()).padStart(2, '0');
+                return `${yyyy}-${mm}-${dd}`;
+            };
+
+            let start = null;
+            let end = null;
+
+            if (selectedTab === 'date') {
+                start = formatDate(startDate);
+                end = formatDate(endDate);
+            } else if (selectedTab === 'flexible' && selectedDates.length > 0) {
+                // 유연한 일정인 경우 선택된 날짜 중 가장 빠른 날과 늦은 날을 범위로 설정 (임시 로직)
+                const sorted = [...selectedDates].sort((a, b) => a - b);
+                start = formatDate(sorted[0]);
+                end = formatDate(sorted[sorted.length - 1]);
+            }
+
+            const payload = {
+                name: roomName,
+                startDate: start,
+                endDate: end,
+                travelStyle: selectedStyleId
+            };
+
+            console.log("Creating Chat Room with payload:", payload);
+
+            // 1. 채팅방 생성 API 호출
+            const newRoom = await createChatRoom(payload);
+            console.log("Created Room:", newRoom);
+
+            const roomId = newRoom?.roomId || newRoom?.id; // 백엔드 응답 필드 확인
+
+            // 2. 초대된 멤버가 있다면 추가 API 호출
+            if (roomId && invitedMemberIds.length > 0) {
+                console.log("Adding members:", invitedMemberIds);
+                // 병렬 처리 또는 순차 처리
+                await Promise.all(invitedMemberIds.map(id => addMember(roomId, id)));
+            }
+
+            // 성공 시 위젯 닫고 목록 새로고침 (또는 생성된 방으로 이동)
+            // 현재는 간단히 reload 또는 상위 컴포넌트 알림
+            alert("여행톡이 생성되었습니다!");
+            window.location.reload(); // 목록 갱신을 위해 리로드
+
+        } catch (error) {
+            console.error("Failed to create chat room:", error);
+            alert("채팅방 생성에 실패했습니다.");
+        }
     };
 
     // --- Helpers ---
@@ -158,11 +205,6 @@ const NewTravelSection = ({ onWizardStateChange }) => {
                     onDateClick={handleDateClick}
                     onNext={handleNextStep}
                 />
-                {/* Back button for Step 1? Maybe just re-clicking or custom back? 
-                    Currently DateSelectionStep doesn't have a back button in UI. 
-                    User can re-click entry if we didn't hide it, but we did. 
-                    I'll add a temporary back handling if needed, but per design usually there's a back.
-                */}
             </div>
 
             {/* STEP 2 */}
@@ -172,7 +214,6 @@ const NewTravelSection = ({ onWizardStateChange }) => {
                     selectedStyleId={selectedStyleId}
                     setSelectedStyleId={setSelectedStyleId}
                     onNext={handleGoToCreation}
-                // onBack={() => setStep(1)} // Should link back to 1
                 />
             </div>
 
@@ -183,6 +224,7 @@ const NewTravelSection = ({ onWizardStateChange }) => {
                     setRoomName={setRoomName}
                     onBack={handleBackToStep2}
                     onStartChat={handleStartChat}
+                    onAddMember={handleAddMember}
                 />
             </div>
         </div>

@@ -13,19 +13,14 @@ const RoomCreationStep = ({
     roomName,
     setRoomName,
     onBack,
-    onStartChat
+    onStartChat,
+    ...props
 }) => {
-    const [image, setImage] = useState(null);
+    const [image] = useState(null);
     const [showIdModal, setShowIdModal] = useState(false);
-
-    // Placeholder image URL - using a generic travel-themed one or just a color if 'image' is null
-    // The design shows a specific boat image. Since I don't have it, I'll use a color or a placeholder.
-    // However, I'll allow the user to visualize "uploading" by clicking (mock).
 
     // Mock upload handler
     const handleImageUpload = () => {
-        // In a real app, this would trigger a file picker
-        // For now, let's just toggle a dummy state or do nothing visually other than the button exists
         console.log("Upload image clicked");
     };
 
@@ -38,8 +33,6 @@ const RoomCreationStep = ({
                         {image ? (
                             <img src={image} alt="Room" className={styles.uploadedImage} />
                         ) : (
-                            // Default background if no image. design uses a boat image. 
-                            // I'll stick to the CSS class I made .defaultImageBg
                             <div className={styles.defaultImageBg} />
                         )}
                     </div>
@@ -70,7 +63,10 @@ const RoomCreationStep = ({
                             <span>카톡으로 초대</span>
                         </div>
                     </button>
-                    <button className={styles.inviteButton}>
+                    <button
+                        className={styles.inviteButton}
+                        onClick={() => alert("채팅방 생성 후 초대 링크를 공유할 수 있습니다.")}
+                    >
                         <div className={styles.btnContent}>
                             <img src={iconLink} alt="Link" className={styles.btnIcon} />
                             <span>링크로 초대</span>
@@ -94,7 +90,7 @@ const RoomCreationStep = ({
                     이전
                 </button>
                 <button
-                    className={`${styles.startButton} ${roomName.length > 0 ? styles.active : ''}`}
+                    className={`${styles.startButton} ${roomName.length > 0 ? styles.startButtonActive : ''}`}
                     disabled={roomName.length === 0}
                     onClick={onStartChat}
                 >
@@ -104,7 +100,17 @@ const RoomCreationStep = ({
 
             {/* ID Search Modal Overlay */}
             {showIdModal && (
-                <UserSearchModal onClose={() => setShowIdModal(false)} />
+                <UserSearchModal
+                    onClose={() => setShowIdModal(false)}
+                    onConfirm={(id) => {
+                        if (props.onAddMember) {
+                            props.onAddMember(id);
+                        } else {
+                            console.warn("onAddMember prop missing");
+                        }
+                        setShowIdModal(false);
+                    }}
+                />
             )}
         </>
     );

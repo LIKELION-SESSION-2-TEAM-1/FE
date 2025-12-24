@@ -30,7 +30,7 @@ const ParticipatingChats = () => {
     const handleRoomClick = (roomId) => {
         // 채팅방 상세 페이지로 이동 (ID 전달)
         // navigate(`/chatroom/${roomId}`); // 향후 동적 라우팅 적용 시
-        navigate('/chatroom'); // 현재는 정적 라우팅 유지
+        navigate('/chatroom', { state: { roomId } });
     };
 
     return (

@@ -449,6 +449,11 @@
     cursor: not-allowed;
 }
 
+.startButtonActive {
+    background-color: #E2481F;
+    cursor: pointer;
+}
+
 /* --- Modal Styles --- */
 .modalOverlay {
     position: fixed;
