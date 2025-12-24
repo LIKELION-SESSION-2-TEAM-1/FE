@@ -1,21 +1,45 @@
 import styles from './Home.module.css';
 import pic from "../../../assets/pic/pic1.png";
 import arrow from "../../../assets/pic/arrow.svg";
-import { NavLink, useNavigate, createSearchParams } from 'react-router-dom';
+import { NavLink, useNavigate, createSearchParams, useLocation } from 'react-router-dom';
 import search from "../../../assets/pic/search.svg";
 import trip from "../../../assets/pic/trip.svg";
 import pic2 from "../../../assets/pic/pic2.png";
 import pic3 from "../../../assets/pic/pic3.png";
 import arrow3 from "../../../assets/pic/arrow3.svg";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import useAuthStore from '../../../stores/useAuthStore';
 import ReccoDetail from "../../../components/Home/ReccoDetail";
 import PopularDetail from "../../../components/Home/PopularDetail";
 
 const Home = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchTerm, setSearchTerm] = useState('');
     const [isReccoExpanded, setIsReccoExpanded] = useState(false);
     const [isPopularExpanded, setIsPopularExpanded] = useState(false);
+
+    // OAuth Token Handling on Home Landing
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const tokenFromUrl = params.get('token');
+
+        if (tokenFromUrl) {
+            console.log("Found token in Home URL:", tokenFromUrl);
+            const accessToken = tokenFromUrl.startsWith('Bearer ')
+                ? tokenFromUrl
+                : `Bearer ${tokenFromUrl}`;
+
+            // Save to LocalStorage
+            localStorage.setItem('accessToken', accessToken);
+
+            // Save to Auth Store
+            useAuthStore.getState().login(accessToken, 'Social User');
+
+            // Clean URL (remove token param)
+            navigate('/home', { replace: true });
+        }
+    }, [location, navigate]);
 
     const handleReccoToggle = () => {
         setIsReccoExpanded(prev => !prev);
