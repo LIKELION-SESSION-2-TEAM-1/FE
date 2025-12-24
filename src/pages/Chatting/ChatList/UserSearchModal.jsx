@@ -43,7 +43,6 @@ const UserSearchModal = ({ onClose, onConfirm }) => {
     };
 
 
-
     // Enter key to search
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
@@ -55,7 +54,7 @@ const UserSearchModal = ({ onClose, onConfirm }) => {
         <div className={styles.modalOverlay}>
             <div className={styles.modalSheet}>
                 <div className={styles.modalHeader}>
-                    <span className={styles.modalTitle}>id로 여행톡에 추가하기</span>
+                    <span className={styles.modalTitle}>ID/닉네임으로 추가</span>
                     <button className={styles.closeButton} onClick={onClose}>
                         <CloseIcon />
                     </button>
