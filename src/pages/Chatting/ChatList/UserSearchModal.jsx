@@ -42,16 +42,6 @@ const UserSearchModal = ({ onClose, onConfirm }) => {
         }
     };
 
-    const handleConfirm = () => {
-        if (searchResult) {
-            onConfirm(searchResult.username || searchResult.userId || searchText); // Username (ID) 우선
-            setSearchText('');
-            setSearchResult(null);
-        } else if (searchText) {
-            // 검색 없이 강제 추가 (옵션)? 일단 검색 유도
-            onConfirm(searchText);
-        }
-    };
 
     // Enter key to search
     const handleKeyDown = (e) => {
@@ -77,9 +67,8 @@ const UserSearchModal = ({ onClose, onConfirm }) => {
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="ID, 닉네임, 이메일 입력"
+                        placeholder="ID를 입력하세요"
                     />
-                    {/* 검색 아이콘 클릭 시 검색 */}
                     <img
                         src={iconSearch}
                         alt="Search"
@@ -89,35 +78,29 @@ const UserSearchModal = ({ onClose, onConfirm }) => {
                     />
                 </div>
 
-                <div style={{ padding: '0 20px 20px 20px' }}>
-
-                    {/* 검색 결과 표시 영역 */}
+                <div className={styles.resultList}>
                     {isSearching ? (
-                        <p style={{ textAlign: 'center', color: '#999' }}>검색 중...</p>
+                        <p style={{ textAlign: 'center', color: '#999', marginTop: '20px' }}>검색 중...</p>
                     ) : searchResult ? (
-                        <div className={styles.userItem} style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#f9f9f9', borderRadius: '12px' }}>
-                            {/* <img src={searchResult.profileImage || "default_img"} className={styles.userAvatar} /> */}
-                            {/* 임시 아바타 */}
-                            <div className={styles.userAvatar} style={{ backgroundColor: '#ccc' }} />
+                        <div className={styles.userItem}>
+                            {/* 임시 아바타 (이미지 있으면 src 사용) */}
+                            <div className={styles.userAvatar} />
                             <div className={styles.userInfo}>
-                                <span className={styles.userName}>{searchResult.displayName || searchResult.username || "알 수 없음"}</span>
-                                <span className={styles.userId}>{searchResult.username}</span>
+                                <span className={styles.userName}>{searchResult.displayName || "알 수 없음"}</span>
+                                <span className={styles.userId}>{searchResult.username || searchResult.userId}</span>
                             </div>
+                            <button
+                                className={styles.addButton}
+                                onClick={() => onConfirm(searchResult.username || searchResult.userId)}
+                            >
+                                추가하기
+                            </button>
                         </div>
                     ) : (
-                        <p style={{ fontSize: '12px', color: '#888', marginBottom: '16px', textAlign: 'center' }}>
-                            {errorMsg || "입력한 정보와 일치하는 사용자를 검색합니다."}
+                        <p style={{ fontSize: '13px', color: '#999', marginTop: '40px', textAlign: 'center' }}>
+                            {errorMsg || "ID를 검색하여 친구를 추가해보세요."}
                         </p>
                     )}
-
-                    <button
-                        className={styles.startButton}
-                        onClick={handleConfirm}
-                        disabled={!searchResult && !searchText} // 검색결과 없어도 텍스트 있으면 강제 추가 가능하게? 일단 허용
-                        style={{ width: '100%', marginTop: '0' }}
-                    >
-                        추가하기
-                    </button>
                 </div>
             </div>
         </div>
