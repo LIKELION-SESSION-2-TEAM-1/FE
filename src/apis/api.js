@@ -8,6 +8,31 @@ const api = axios.create({
     },
 });
 
+// Request interceptor to add the auth token to every request
+// Request interceptor to add the auth token to every request
+api.interceptors.request.use(
+    (config) => {
+        // Exclude token for login and signup endpoints to prevent 401s from invalid old tokens
+        if (config.url.endsWith('/login') || config.url.endsWith('/signup')) {
+            return config;
+        }
+
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            // Token might already have 'Bearer ' prefix (from OAuth redirect handling or manual set)
+            // or it might be raw JWT. We ensure it has 'Bearer ' prefix.
+            const formattedToken = token.startsWith('Bearer ')
+                ? token
+                : `Bearer ${token}`;
+            config.headers['Authorization'] = formattedToken;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 export const signup = async (username, password) => {
     try {
         const response = await api.post('/api/user/signup', { username, password });
@@ -22,6 +47,26 @@ export const login = async (username, password) => {
         const response = await api.post('/api/user/login', { username, password });
         return response;
     } catch (error) {
+        throw error;
+    }
+};
+
+export const getProfile = async () => {
+    try {
+        const response = await api.get('/api/user/profile');
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch profile:", error);
+        throw error;
+    }
+};
+
+export const updateProfile = async (profileData) => {
+    try {
+        const response = await api.put('/api/user/profile', profileData);
+        return response.data;
+    } catch (error) {
+        console.error("Failed to update profile:", error);
         throw error;
     }
 };

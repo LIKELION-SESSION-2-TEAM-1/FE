@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './TripStyleEdit.module.css';
+import { getProfile, updateProfile } from '../../apis/api';
 
 const TripStyleEdit = () => {
     const navigate = useNavigate();
 
-    // Mock State
-    const [pace, setPace] = useState('느림'); // Single select
-    const [rhythm, setRhythm] = useState('유연'); // Single select
-
-    // Multi select arrays
-    const [foodPrefs, setFoodPrefs] = useState(['고기']);
-    const [constraints, setConstraints] = useState(['감자 양배추']);
+    // State
+    const [pace, setPace] = useState('');
+    const [rhythm, setRhythm] = useState('');
+    const [foodPrefs, setFoodPrefs] = useState([]);
+    const [constraints, setConstraints] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const toggleMultiSelect = (currentList, setList, item) => {
         if (currentList.includes(item)) {
@@ -20,6 +20,54 @@ const TripStyleEdit = () => {
             setList([...currentList, item]);
         }
     };
+
+    // Load initial data
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const data = await getProfile();
+                if (data) {
+                    setPace(data.travelPace || '');
+                    setRhythm(data.dailyRhythm || '');
+                    setFoodPrefs(data.foodPreferences || []);
+                    setConstraints(data.foodRestrictions || []);
+                }
+            } catch (error) {
+                console.error("Failed to load profile", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, []);
+
+    const handleUpdate = async () => {
+        // API 명세 (부분 수정 지원)에 따라 변경된 스타일만 전송
+        const payload = {
+            travelPace: pace,
+            dailyRhythm: rhythm,
+            foodPreferences: foodPrefs,
+            foodRestrictions: constraints
+        };
+        console.log("Sending Payload:", payload); // 디버깅용 로그
+
+        try {
+            await updateProfile(payload);
+            alert("여행 스타일이 성공적으로 수정되었습니다.");
+            navigate(-1);
+        } catch (error) {
+            console.error("Failed to update profile", error);
+            if (error.response && error.response.status === 401) {
+                alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                localStorage.removeItem('accessToken');
+                navigate('/login');
+                return;
+            }
+            alert("수정에 실패했습니다.");
+        }
+    };
+
+    if (loading) return <div className={styles.container}>Loading...</div>;
 
     return (
         <div className={styles.container}>
@@ -120,7 +168,7 @@ const TripStyleEdit = () => {
 
             {/* Submit Button */}
             <div className={styles.submitButtonContainer}>
-                <button className={styles.submitButton} onClick={() => navigate(-1)}>
+                <button className={styles.submitButton} onClick={handleUpdate}>
                     수정하기
                     {/* Recreating the long thin arrow from the image using SVG */}
                     <svg width="50" height="24" viewBox="0 0 50 24" fill="none" className={styles.arrowIcon} xmlns="http://www.w3.org/2000/svg">
