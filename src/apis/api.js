@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getAccessToken } from '../utils/authToken';
 
 // --- Axios Implementation for Login/Signup (Headers Access Required) ---
 const api = axios.create({
@@ -17,15 +18,8 @@ api.interceptors.request.use(
             return config;
         }
 
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            // Token might already have 'Bearer ' prefix (from OAuth redirect handling or manual set)
-            // or it might be raw JWT. We ensure it has 'Bearer ' prefix.
-            const formattedToken = token.startsWith('Bearer ')
-                ? token
-                : `Bearer ${token}`;
-            config.headers['Authorization'] = formattedToken;
-        }
+        const token = getAccessToken();
+        if (token) config.headers['Authorization'] = token;
         return config;
     },
     (error) => {

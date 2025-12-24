@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MyPage.module.css';
 import { getProfile, updateProfile, deleteAccount } from '../../apis/api';
+import { getAccessToken, setAccessToken, clearAccessToken } from '../../utils/authToken';
 
 // Assets
 import profileImg from '../../assets/pic/dogeja_cat1.png'; // Fallback or user image
@@ -17,19 +18,51 @@ const MyPage = () => {
     // Hooks must be unconditional. Effects too.
     useEffect(() => {
         const fetchProfile = async () => {
-            // Race condition fix: Check URL first if localStorage is empty
+            // 소셜 로그인 리다이렉트 케이스: URL 토큰이 있으면 우선 저장
             const params = new URLSearchParams(window.location.search);
-            const urlToken = params.get('token');
-            let token = localStorage.getItem('accessToken');
+            const hashString = (window.location.hash || '').startsWith('#')
+                ? (window.location.hash || '').slice(1)
+                : (window.location.hash || '');
+            const hashParams = new URLSearchParams(hashString);
 
-            if (!token && urlToken) {
-                console.log("MyPage: Found token in URL fallback");
-                token = urlToken.startsWith('Bearer ') ? urlToken : `Bearer ${urlToken}`;
-                localStorage.setItem('accessToken', token);
+            const urlToken =
+                params.get('token') ||
+                params.get('access_token') ||
+                params.get('accessToken') ||
+                params.get('authorization') ||
+                hashParams.get('token') ||
+                hashParams.get('access_token') ||
+                hashParams.get('accessToken') ||
+                hashParams.get('authorization');
+            if (urlToken) {
+                console.log('MyPage: Found token in URL');
+                setAccessToken(urlToken, 'Social User');
             }
 
+            const token = getAccessToken();
             if (!token) {
-                console.warn("MyPage: No token found in localStorage or URL");
+                const rawAccessToken = localStorage.getItem('accessToken');
+                const rawAuthStorage = localStorage.getItem('auth-storage');
+
+                const authDebug = {
+                    at: new Date().toISOString(),
+                    from: 'MyPage',
+                    href: window.location.href,
+                    accessTokenPresent: Boolean(rawAccessToken),
+                    accessTokenLength: rawAccessToken ? rawAccessToken.length : 0,
+                    accessTokenHasBearerPrefix: rawAccessToken ? rawAccessToken.startsWith('Bearer ') : false,
+                    authStoragePresent: Boolean(rawAuthStorage),
+                    authStorageLength: rawAuthStorage ? rawAuthStorage.length : 0,
+                };
+
+                // Navigation to /login may make the console hard to read; persist debug across navigation.
+                try {
+                    sessionStorage.setItem('auth_debug', JSON.stringify(authDebug));
+                } catch {
+                    // ignore
+                }
+
+                console.warn('MyPage: No token found in localStorage or URL', authDebug);
                 alert("로그인이 필요합니다.");
                 navigate('/login');
                 return;
@@ -43,7 +76,7 @@ const MyPage = () => {
                 console.error("Failed to load profile", error);
                 if (error.response && error.response.status === 401) {
                     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-                    localStorage.removeItem('accessToken');
+                    clearAccessToken();
                     navigate('/login');
                 }
             } finally {
@@ -98,7 +131,7 @@ const MyPage = () => {
                 if (error.response) {
                     if (error.response.status === 401) {
                         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-                        localStorage.removeItem('accessToken');
+                        clearAccessToken();
                         navigate('/login');
                         return;
                     } else if (error.response.status === 400) {
@@ -134,7 +167,7 @@ const MyPage = () => {
         try {
             await deleteAccount();
             alert("회원 탈퇴 완료");
-            localStorage.removeItem('accessToken');
+            clearAccessToken();
             navigate('/');
         } catch (error) {
             console.error("Account deletion failed", error);
