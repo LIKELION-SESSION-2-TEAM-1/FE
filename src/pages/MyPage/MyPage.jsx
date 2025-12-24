@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MyPage.module.css';
-import { getProfile, updateProfile } from '../../apis/api';
+import { getProfile, updateProfile, deleteAccount } from '../../apis/api';
 
 // Assets
 import profileImg from '../../assets/pic/dogeja_cat1.png'; // Fallback or user image
@@ -50,27 +50,50 @@ const MyPage = () => {
         if (isEditing) {
             // Save changes
             try {
-                // 생년월일 조합 (YYYY-MM-DD)
-                const fullBirthDate = `${editData.year || birthDateParts[0]}-${editData.month || birthDateParts[1]}-${editData.day || birthDateParts[2]}`;
+                let fullBirthDate = null;
+
+                // Validate Birth Date
+                if (editData.year || editData.month || editData.day) {
+                    const y = parseInt(editData.year, 10);
+                    const m = parseInt(editData.month, 10);
+                    const d = parseInt(editData.day, 10);
+
+                    if (isNaN(y) || isNaN(m) || isNaN(d) || y < 1900 || m < 1 || m > 12 || d < 1 || d > 31) {
+                        alert("생년월일을 올바르게 입력해주세요. (예: 1999-01-01)");
+                        return;
+                    }
+                    // Format as YYYY-MM-DD
+                    const formattedM = m.toString().padStart(2, '0');
+                    const formattedD = d.toString().padStart(2, '0');
+                    fullBirthDate = `${y}-${formattedM}-${formattedD}`;
+                }
 
                 // 부분 수정 지원: 변경할 필드만 전송
                 const payload = {
                     nickname: editData.nickname,
-                    birthDate: fullBirthDate
                 };
+                if (fullBirthDate) {
+                    payload.birthDate = fullBirthDate;
+                }
 
                 await updateProfile(payload);
+
                 // 로컬 profile 상태도 부분 업데이트
                 setProfile(prev => ({ ...prev, ...payload }));
                 setIsEditing(false);
                 alert("회원 정보가 수정되었습니다.");
             } catch (error) {
                 console.error("Failed to update profile", error);
-                if (error.response && error.response.status === 401) {
-                    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-                    localStorage.removeItem('accessToken');
-                    navigate('/login');
-                    return;
+                if (error.response) {
+                    if (error.response.status === 401) {
+                        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                        localStorage.removeItem('accessToken');
+                        navigate('/login');
+                        return;
+                    } else if (error.response.status === 400) {
+                        alert("잘못된 요청입니다. 입력 값을 확인해주세요. (생년월일 형식: YYYY-MM-DD)");
+                        return;
+                    }
                 }
                 alert("수정에 실패했습니다.");
             }
@@ -89,6 +112,23 @@ const MyPage = () => {
     const handleEditChange = (e) => {
         const { name, value } = e.target;
         setEditData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Account Deletion Handler
+    const handleDeleteAccount = async () => {
+        if (!window.confirm("정말로 탈퇴하시겠습니까? 탈퇴 시 모든 정보가 삭제됩니다.")) {
+            return;
+        }
+
+        try {
+            await deleteAccount();
+            alert("회원 탈퇴 완료");
+            localStorage.removeItem('accessToken');
+            navigate('/');
+        } catch (error) {
+            console.error("Account deletion failed", error);
+            alert("회원 탈퇴에 실패했습니다.");
+        }
     };
 
     if (loading) return <div className={styles.container}>Loading...</div>;
@@ -157,11 +197,11 @@ const MyPage = () => {
                                 />
                             </>
                         ) : (
-                            <>
+                            <div className={styles.dateInputs} onClick={handleEditToggle} style={{ cursor: 'pointer' }} title="눌러서 수정하기">
                                 <div className={styles.dateBox}>{birthDateParts[0]}</div>
                                 <div className={styles.dateBox}>{birthDateParts[1]}</div>
                                 <div className={styles.dateBox}>{birthDateParts[2]}</div>
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -191,8 +231,9 @@ const MyPage = () => {
             </div>
 
             {/* Delete Account */}
+            {/* Delete Account */}
             <div className={styles.deleteAccountContainer}>
-                <button className={styles.deleteAccountButton}>회원 탈퇴하기</button>
+                <button className={styles.deleteAccountButton} onClick={handleDeleteAccount}>회원 탈퇴하기</button>
             </div>
         </div>
     );

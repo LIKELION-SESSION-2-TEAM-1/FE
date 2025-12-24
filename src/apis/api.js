@@ -70,6 +70,16 @@ export const updateProfile = async (profileData) => {
         throw error;
     }
 };
+export const deleteAccount = async () => {
+    try {
+        const response = await api.delete('/api/user');
+        return response.data;
+    } catch (error) {
+        console.error("Failed to delete account:", error);
+        throw error;
+    }
+};
+
 export default api;
 
 
