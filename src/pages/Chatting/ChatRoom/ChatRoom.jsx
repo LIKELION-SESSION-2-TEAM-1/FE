@@ -3,6 +3,9 @@ import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import WSClient from '../../../websocket/WebSocket';
 import { fetchAiKeywords, fetchAiPlan } from '../../../apis/aiApi';
+import { getProfile } from '../../../apis/api';
+import { getChatHistory, createInviteLink, addMember, getChatRoomMembers, deleteChatRoom } from '../../../apis/chatApi'; // [추가] API
+import UserSearchModal from '../ChatList/UserSearchModal'; // [추가] 멤버 추가 모달 재사용
 import sendIcon from "../../../assets/pic/send.svg";
 import searchIcon from "../../../assets/pic/search.svg";
 import menuIcon from "../../../assets/pic/menu.svg";
@@ -33,22 +36,30 @@ const ChatRoom = () => {
     const messagesRef = useRef([]);
 
     // 내 정보 관리
-    const [me] = useState(() => {
-        const savedId = sessionStorage.getItem("chat_userId");
-        const savedName = sessionStorage.getItem("chat_userName");
+    const [me, setMe] = useState(null);
 
-        if (savedId && savedName) {
-            return { userId: parseInt(savedId), userName: savedName };
-        }
+    // [추가] 메뉴 및 모달 상태
+    const [showMenu, setShowMenu] = useState(false);
+    const [showInviteModal, setShowInviteModal] = useState(false);
 
-        const newId = Math.floor(Math.random() * 100000);
-        const newName = `User_${newId}`;
-
-        sessionStorage.setItem("chat_userId", newId);
-        sessionStorage.setItem("chat_userName", newName);
-
-        return { userId: newId, userName: newName };
-    });
+    useEffect(() => {
+        const loadProfile = async () => {
+            try {
+                const profile = await getProfile();
+                // 백엔드 User 엔티티의 id(Long)와 nickname/username 사용
+                setMe({
+                    userId: profile.id || profile.userId, // 백엔드 응답 필드 확인 필요. 보통 id
+                    userName: profile.nickname || profile.username
+                });
+            } catch (error) {
+                console.error("Failed to load profile for chat", error);
+                // 로그인 안된 경우 처리 (여기서는 임시로 랜덤)
+                const newId = Math.floor(Math.random() * 100000);
+                setMe({ userId: newId, userName: `Guest_${newId}` });
+            }
+        };
+        loadProfile();
+    }, []);
 
     const ws = useMemo(() => new WSClient({ reconnectDelay: 4000 }), []);
 
@@ -125,7 +136,8 @@ const ChatRoom = () => {
                 if (roomId) {
                     setActiveRoom(room || { roomId, name: '채팅방' });
 
-                    const history = await WSClient.fetchChats(roomId);
+                    // WSClient.fetchChats 대신 api.js를 사용하는 getChatHistory 호출 (헤더 자동 포함)
+                    const history = await getChatHistory(roomId);
                     if (Array.isArray(history) && history.length) {
                         setMessages(history);
                     }
@@ -134,6 +146,9 @@ const ChatRoom = () => {
                     ws.connect({
                         onMessage: (msg) => handleReceive(msg, roomId),
                     });
+
+                    // 멤버 수 조회
+                    fetchMembers(roomId);
                 }
             } catch (e) {
                 console.error(e);
@@ -146,7 +161,7 @@ const ChatRoom = () => {
     }, [ws, handleReceive, location.state]);
 
     const handleSend = () => {
-        if (!text.trim() || !activeRoom) return;
+        if (!text.trim() || !activeRoom || !me) return;
         const roomId = activeRoom.roomId ?? activeRoom.id;
 
         let payload = WSClient.buildTalkMessage({
@@ -203,6 +218,73 @@ const ChatRoom = () => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();
+        }
+    };
+
+    // [추가] 초기 멤버 수 상태 (기본 1명)
+    const [memberCount, setMemberCount] = useState(1);
+
+    // [추가] API import (파일 상단에 추가 필요하지만 여기서는 로직만)
+    // import { getChatRoomMembers, deleteChatRoom } from '../../../apis/chatApi';
+
+    const handleCreateInvite = async () => {
+        if (!activeRoom) return;
+        const roomId = activeRoom.roomId ?? activeRoom.id;
+        try {
+            const data = await createInviteLink(roomId);
+            if (data && data.inviteUrl) {
+                // 클립보드 복사
+                await navigator.clipboard.writeText(data.inviteUrl);
+                alert(`초대 링크가 복사되었습니다!\n${data.inviteUrl}`);
+            } else {
+                alert("초대 링크 생성에 실패했습니다.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("초대 링크 생성 중 오류가 발생했습니다.");
+        }
+        setShowMenu(false);
+    };
+
+    const handleAddMemberId = async (identifier) => {
+        if (!activeRoom) return;
+        const roomId = activeRoom.roomId ?? activeRoom.id;
+        try {
+            await addMember(roomId, identifier);
+            alert(`${identifier}님이 채팅방에 추가되었습니다.`);
+            // 멤버 수 갱신
+            fetchMembers(roomId);
+        } catch (error) {
+            console.error(error);
+            alert("멤버 추가에 실패했습니다. ID를 확인해주세요.");
+        }
+        setShowInviteModal(false);
+        setShowMenu(false);
+    };
+
+    const fetchMembers = async (roomId) => {
+        try {
+            const data = await getChatRoomMembers(roomId);
+            if (data && data.memberCount) {
+                setMemberCount(data.memberCount);
+            }
+        } catch (error) {
+            console.error("Failed to fetch members:", error);
+        }
+    };
+
+    const handleDeleteRoom = async () => {
+        if (!activeRoom) return;
+        const roomId = activeRoom.roomId ?? activeRoom.id;
+        if (!window.confirm("정말로 채팅방을 삭제하시겠습니까? (방장만 가능합니다)")) return;
+
+        try {
+            await deleteChatRoom(roomId);
+            alert("채팅방이 삭제되었습니다.");
+            navigate('/home'); // 또는 채팅 목록으로 이동
+        } catch (error) {
+            console.error("Failed to delete room:", error);
+            alert("채팅방 삭제에 실패했습니다. 방장 권한이 있는지 확인해주세요.");
         }
     };
 
@@ -288,11 +370,53 @@ const ChatRoom = () => {
                     </button>
                     <div className={styles.titleGroup}>
                         <h1 className={styles.title}>{activeRoom?.name || "채팅방"}</h1>
-                        <span className={styles.memberCount}>6</span>
+                        <span className={styles.memberCount}>{memberCount}</span>
                     </div>
                     <div className={styles.topIcons}>
                         <img className={styles.iconImg} src={searchIcon} alt="search" />
-                        <img className={styles.iconImg} src={menuIcon} alt="menu" />
+                        <div style={{ position: 'relative' }}>
+                            <img
+                                className={styles.iconImg}
+                                src={menuIcon}
+                                alt="menu"
+                                onClick={() => setShowMenu(!showMenu)}
+                                style={{ cursor: 'pointer' }}
+                            />
+                            {showMenu && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '30px',
+                                    right: '0',
+                                    backgroundColor: 'white',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                    zIndex: 100,
+                                    width: '150px',
+                                    display: 'flex',
+                                    flexDirection: 'column'
+                                }}>
+                                    <button
+                                        onClick={handleCreateInvite}
+                                        style={{ padding: '10px', borderBottom: '1px solid #eee', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer' }}
+                                    >
+                                        초대 링크 복사
+                                    </button>
+                                    <button
+                                        onClick={() => setShowInviteModal(true)}
+                                        style={{ padding: '10px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', borderBottom: '1px solid #eee' }}
+                                    >
+                                        멤버 추가
+                                    </button>
+                                    <button
+                                        onClick={handleDeleteRoom}
+                                        style={{ padding: '10px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: 'red' }}
+                                    >
+                                        나가기(방삭제)
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </header>
                 <div className={styles.aiToolbar}>
@@ -310,7 +434,7 @@ const ChatRoom = () => {
             <div className={styles.messageList}>
                 {shouldRenderAi && aiInsertIndex === 0 && renderAiBlock()}
                 {messages.map((m, idx) => {
-                    const isMe = (m.senderUserId === me.userId) || (!m.senderUserId && m.senderName === me.userName);
+                    const isMe = me && ((m.senderUserId === me.userId) || (!m.senderUserId && m.senderName === me.userName));
                     const avatarImg = m.senderName === "민수" ? pic2 : null;
                     const avatarStyle = isMe
                         ? { background: myGradient }
@@ -387,6 +511,13 @@ const ChatRoom = () => {
                     <img src={sendIcon} alt="" />
                 </button>
             </div>
+            {/* [추가] 멤버 추가 모달 */}
+            {showInviteModal && (
+                <UserSearchModal
+                    onClose={() => setShowInviteModal(false)}
+                    onConfirm={handleAddMemberId}
+                />
+            )}
         </div>
     );
 };

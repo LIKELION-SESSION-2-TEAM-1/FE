@@ -10,6 +10,7 @@ import Landing from './pages/Landing/Landing';
 import Home from './pages/OnBoarding/Home/Home';
 import ChatList from './pages/Chatting/ChatList/ChatList';
 import ChatRoom from './pages/Chatting/ChatRoom/ChatRoom';
+import ChatJoinPage from './pages/Chatting/ChatJoin/ChatJoinPage';
 
 import AuthChoice from './pages/AuthChoice/AuthChoice';
 import Signup from './pages/Signup/Signup';
@@ -69,6 +70,7 @@ function App() {
                         <Route path="/home" element={<Home />} />
                         <Route path="/chatlist" element={<ChatList />} />
                         <Route path="/chatroom" element={<ChatRoom />} />
+                        <Route path="/chat/join" element={<ChatJoinPage />} />
 
                         {/* Auth Routes */}
                         <Route path="/start" element={<AuthChoice />} />
