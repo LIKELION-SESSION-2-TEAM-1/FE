@@ -403,7 +403,10 @@ const ChatRoom = () => {
                                         초대 링크 복사
                                     </button>
                                     <button
-                                        onClick={() => setShowInviteModal(true)}
+                                        onClick={() => {
+                                            setShowMenu(false);
+                                            setShowInviteModal(true);
+                                        }}
                                         style={{ padding: '10px', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', borderBottom: '1px solid #eee' }}
                                     >
                                         멤버 추가
