@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './TripStyleEdit.module.css';
 import { getProfile, updateProfile } from '../../apis/api';
+import { clearAccessToken } from '../../utils/authToken';
 
 const TripStyleEdit = () => {
     const navigate = useNavigate();
@@ -59,7 +60,7 @@ const TripStyleEdit = () => {
             console.error("Failed to update profile", error);
             if (error.response && error.response.status === 401) {
                 alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-                localStorage.removeItem('accessToken');
+                clearAccessToken();
                 navigate('/login');
                 return;
             }

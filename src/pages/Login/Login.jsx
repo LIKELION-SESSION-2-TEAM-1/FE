@@ -23,6 +23,17 @@ const Login = () => {
     // OAuth Redirect Handling
     // Google/Kakao login redirects to: /login?token=<pure_jwt>
     useEffect(() => {
+        // If another page redirected here due to missing token, surface debug info.
+        try {
+            const raw = sessionStorage.getItem('auth_debug');
+            if (raw) {
+                console.warn('Auth debug (from redirect):', JSON.parse(raw));
+                sessionStorage.removeItem('auth_debug');
+            }
+        } catch {
+            // ignore
+        }
+
         const params = new URLSearchParams(location.search);
         const tokenFromUrl = params.get('token');
 

@@ -1,6 +1,8 @@
 import './assets/css/styles.module.css';
 import frame from './AppFrame.module.css';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { setAccessToken } from './utils/authToken';
 
 import Header from './components/Header/Header.jsx'
 import NavBar from './components/NavBar/NavBar.jsx'
@@ -19,7 +21,35 @@ import MyPage from './pages/MyPage/MyPage';
 import TripStyleEdit from './pages/MyPage/TripStyleEdit';
 
 function App() {
-    const { pathname } = useLocation();
+    const { pathname, search, hash } = useLocation();
+    const navigate = useNavigate();
+
+    // Global OAuth Token Handling
+    useEffect(() => {
+        const searchParams = new URLSearchParams(search);
+
+        // Some providers/backends may return token in hash fragment: #token=... or #access_token=...
+        const hashString = (hash || '').startsWith('#') ? (hash || '').slice(1) : (hash || '');
+        const hashParams = new URLSearchParams(hashString);
+
+        const tokenFromUrl =
+            searchParams.get('token') ||
+            searchParams.get('access_token') ||
+            searchParams.get('accessToken') ||
+            searchParams.get('authorization') ||
+            hashParams.get('token') ||
+            hashParams.get('access_token') ||
+            hashParams.get('accessToken') ||
+            hashParams.get('authorization');
+
+        if (tokenFromUrl) {
+            console.log("Global Token Handler: Found token in URL");
+            setAccessToken(tokenFromUrl, 'Social User');
+
+            // Remove token from URL but stay on the same page
+            navigate(pathname, { replace: true });
+        }
+    }, [search, hash, pathname, navigate]);
     // Merge hideHeader conditions: chatlist, chatroom, landing(/), start page, login page, dogeja page, mypage, edit-style
     const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/' || pathname === '/start' || pathname === '/dogeja' || pathname === '/mypage' || pathname === '/mypage/edit-style';
     const isChatRoom = pathname === '/chatroom';

@@ -11,7 +11,10 @@ import { API_BASE_URL } from '../../apis/api';
 
 const AuthChoice = () => {
     const handleSocialLogin = (provider) => {
-        window.location.href = `${API_BASE_URL}oauth2/authorization/${provider}`;
+        // 로컬/배포 환경에 따라 돌아올 프론트 주소가 달라야 함
+        // (백엔드가 redirect_uri 파라미터를 지원해야 동작)
+        const redirectUri = `${window.location.origin}/home`;
+        window.location.href = `${API_BASE_URL}oauth2/authorization/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}`;
     };
 
     return (
