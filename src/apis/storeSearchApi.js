@@ -1,4 +1,5 @@
 import api, { searchApi } from "./api";
+import Aromanize from "aromanize";
 
 /**
  * 여행지(스토어) 검색
@@ -6,9 +7,16 @@ import api, { searchApi } from "./api";
  * @returns {Promise<Array>} 검색 결과 배열
  */
 export const searchStores = async (keyword) => {
-    const term = typeof keyword === "string" ? keyword.trim() : "";
+    let term = typeof keyword === "string" ? keyword.trim() : "";
     if (!term) {
         throw new Error("검색어(keyword)를 입력해주세요.");
+    }
+
+    // [한글 깨짐 방지] 사용자의 요청대로 내부적으로 영문 변환(Romanization) 후 검색
+    const romanizedTerm = Aromanize.romanize(term);
+    if (romanizedTerm !== term) {
+        console.log(`[Search] Converting Korean '${term}' to English '${romanizedTerm}'`);
+        term = romanizedTerm;
     }
 
     // 유저가 Postman으로 확인한 결과, 검색 API도 Main 서버(beeee...)에 있음.
