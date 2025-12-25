@@ -5,7 +5,7 @@ import styles from './Login.module.css';
 import useAuthStore from '../../stores/useAuthStore';
 import BackgroundPattern from '../../components/Landing/BackgroundPattern';
 import arrow from '../../assets/pic/arrow.svg';
-import { login } from '../../apis/api';
+import { login, getProfile } from '../../apis/api';
 
 import Loading from '../../components/Loading/Loading';
 import Snow from '../../components/Landing/Snow';
@@ -43,10 +43,19 @@ const Login = () => {
             const accessToken = `Bearer ${tokenFromUrl}`;
 
             localStorage.setItem('accessToken', accessToken);
-            useAuthStore.getState().login(accessToken, 'Social User'); // We might not have username yet
 
-            // Navigate to home to clear URL params
-            navigate('/home', { replace: true });
+            // Fetch Profile to get real nickname
+            getProfile()
+                .then((profile) => {
+                    const realName = profile?.nickname || profile?.username || 'Social User';
+                    useAuthStore.getState().login(accessToken, realName);
+                    navigate('/home', { replace: true });
+                })
+                .catch((err) => {
+                    console.error("Failed to fetch profile during OAuth login:", err);
+                    useAuthStore.getState().login(accessToken, 'Social User');
+                    navigate('/home', { replace: true });
+                });
         }
     }, [location, navigate]);
 
