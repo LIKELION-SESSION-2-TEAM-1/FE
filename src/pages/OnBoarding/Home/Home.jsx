@@ -12,14 +12,11 @@ import arrow3 from "../../../assets/pic/arrow3.svg";
 
 import ReccoDetail from "../../../components/Home/ReccoDetail";
 import PopularDetail from "../../../components/Home/PopularDetail";
+import SearchOverlay from "../../../components/Home/SearchOverlay";
 
-import { getProfile, updateProfile } from '../../../apis/api';
-import {
-    getRecentSearches,
-    addRecentSearch,
-    deleteRecentSearch,
-    deleteAllRecentSearches
-} from '../../../apis/storeSearchApi';
+import { getProfile } from '../../../apis/api';
+
+import useAuthStore from '../../../stores/useAuthStore';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -30,19 +27,28 @@ const Home = () => {
     const [isPopularExpanded, setIsPopularExpanded] = useState(false);
     const [isSearchMode, setIsSearchMode] = useState(false);
 
-    // Data State (Recent Search)
-    const [recentSearches, setRecentSearches] = useState([]);
-    const [isAutoSave, setIsAutoSave] = useState(true);
 
-    // Initial Load: Get Profile for AutoSave setting
+
+    // Initial Load: Get Profile for AutoSave setting & Name correction
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const profile = await getProfile();
-                // If profile has recentSearchEnabled, use it. Default true.
-                if (profile && typeof profile.recentSearchEnabled === 'boolean') {
-                    setIsAutoSave(profile.recentSearchEnabled);
+
+                // [Auto Correction] If current user name is 'Social User', update it with real profile name
+                const { user, login, token } = useAuthStore.getState();
+                const realName = profile?.nickname || profile?.username || profile?.name;
+
+                if (realName && (user?.username === 'Social User' || !user?.username)) {
+                    console.log("Updating Social User to:", realName);
+                    // If token is missing in store (rare), try localStorage or just pass null (login might need token)
+                    const currentToken = token || localStorage.getItem('accessToken');
+                    if (currentToken) {
+                        login(currentToken, realName);
+                    }
                 }
+
+
             } catch (err) {
                 console.error("Failed to fetch profile settings", err);
             }
@@ -50,23 +56,7 @@ const Home = () => {
         fetchProfile();
     }, []);
 
-    // Load Recent Searches when entering Search Mode
-    useEffect(() => {
-        if (isSearchMode) {
-            fetchRecentSearches();
-        }
-    }, [isSearchMode]);
 
-    const fetchRecentSearches = async () => {
-        try {
-            const data = await getRecentSearches();
-            // Data format check: data might be array or boxed
-            const list = Array.isArray(data) ? data : (data?.content || []);
-            setRecentSearches(list);
-        } catch (err) {
-            console.error("Failed to load recent searches", err);
-        }
-    };
 
     const handleReccoToggle = () => setIsReccoExpanded(prev => !prev);
     const handleDetailClose = () => setIsReccoExpanded(false);
@@ -77,66 +67,7 @@ const Home = () => {
     const openSearchMode = () => setIsSearchMode(true);
     const closeSearchMode = () => setIsSearchMode(false);
 
-    const handleSearchSubmit = async (event) => {
-        event.preventDefault();
-        const term = searchTerm.trim();
-        if (!term) return;
 
-        // Auto Save (Optimistic or await)
-        if (isAutoSave) {
-            try {
-                await addRecentSearch(term);
-                // No need to re-fetch if we are navigating away immediately
-            } catch (err) {
-                console.error("Failed to save recent search", err);
-            }
-        }
-
-        navigate({
-            pathname: '/search',
-            search: `?${createSearchParams({ keyword: term })}`
-        });
-    };
-
-    const handleRecentItemClick = (keyword) => {
-        // Clicking a recent item runs the search
-        setSearchTerm(keyword);
-        navigate({
-            pathname: '/search',
-            search: `?${createSearchParams({ keyword: keyword })}`
-        });
-    };
-
-    const handleDeleteRecent = async (e, id) => {
-        e.stopPropagation(); // prevent triggering item click
-        try {
-            await deleteRecentSearch(id);
-            setRecentSearches(prev => prev.filter(item => item.id !== id && item.recentSearchId !== id)); // Handle potential ID field diffs
-        } catch (err) {
-            console.error("Failed to delete recent search", err);
-        }
-    };
-
-    const handleDeleteAll = async () => {
-        try {
-            await deleteAllRecentSearches();
-            setRecentSearches([]);
-        } catch (err) {
-            console.error("Failed to delete all", err);
-        }
-    };
-
-    const handleToggleAutoSave = async () => {
-        const newValue = !isAutoSave;
-        setIsAutoSave(newValue);
-        try {
-            await updateProfile({ recentSearchEnabled: newValue });
-        } catch (err) {
-            console.error("Failed to update auto save setting", err);
-            // Revert on error
-            setIsAutoSave(!newValue);
-        }
-    };
 
     return (
         <div className={styles.main__wrapper}>
@@ -183,10 +114,20 @@ const Home = () => {
                                 </div>
 
                                 <div className={styles.cards}>
-                                    <div className={styles.style}>
+                                    <div
+                                        className={styles.style}
+                                        onClick={() => navigate('/mypage/edit-style')}
+                                        style={{ cursor: 'pointer' }}
+                                    >
                                         <p className={styles.style__text}>여행 스타일<br />설정하기</p>
                                     </div>
-                                    <img src={pic2} alt="" className={styles.pic2} />
+                                    <img
+                                        src={pic2}
+                                        alt=""
+                                        className={styles.pic2}
+                                        onClick={() => navigate('/dogeja')}
+                                        style={{ cursor: 'pointer' }}
+                                    />
                                 </div>
                             </div>
                         )}
@@ -212,66 +153,7 @@ const Home = () => {
 
                 {/* Search Mode View */}
                 {isSearchMode && (
-                    <div className={styles.searchOverlay}>
-                        <div className={styles.searchHeader}>
-                            <img
-                                src={arrow}
-                                alt="back"
-                                className={styles.backButton_icon}
-                                onClick={closeSearchMode}
-                            />
-                            <span className={styles.headerTitle}>TokPlan</span>
-                        </div>
-
-                        <form className={styles.searchBarFocused} onSubmit={handleSearchSubmit}>
-                            <button type="submit" className={styles.searchBar__iconButton} aria-label="여행지 검색">
-                                <img src={search} alt="" className={styles.searchBar__icon} />
-                            </button>
-                            <input
-                                className={styles.searchBar__input}
-                                type="search"
-                                placeholder='여행지 검색하기'
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                autoFocus
-                            />
-                        </form>
-
-                        <div className={styles.recentContainer}>
-                            <div className={styles.recentHeader}>
-                                <span className={styles.recentTitle}>최근 검색</span>
-                                <div className={styles.recentActions}>
-                                    <span className={styles.actionButton} onClick={handleDeleteAll}>전체삭제</span>
-                                    <span>|</span>
-                                    <span className={styles.actionButton} onClick={handleToggleAutoSave}>
-                                        {isAutoSave ? '자동저장 끄기' : '자동저장 켜기'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {!isAutoSave ? (
-                                <p className={styles.msgDisabled}>최근 검색 저장 기능이 꺼져 있습니다.</p>
-                            ) : (
-                                <div className={styles.recentList}>
-                                    {recentSearches.length === 0 ? (
-                                        <p className={styles.msgDisabled} style={{ marginTop: '20px' }}>최근 검색어가 없습니다.</p>
-                                    ) : (
-                                        recentSearches.map((item, index) => (
-                                            <div key={item.id || item.recentSearchId || index} className={styles.recentItem} onClick={() => handleRecentItemClick(item.keyword)}>
-                                                <span>{item.keyword}</span>
-                                                <span
-                                                    className={styles.deleteItemBtn}
-                                                    onClick={(e) => handleDeleteRecent(e, item.id || item.recentSearchId)}
-                                                >
-                                                    X
-                                                </span>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                    <SearchOverlay onClose={closeSearchMode} />
                 )}
 
             </div>

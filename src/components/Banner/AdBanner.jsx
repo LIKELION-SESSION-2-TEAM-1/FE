@@ -6,7 +6,7 @@ const AdBanner = () => {
     return (
         <a
             className={styles.bannerCard}
-            href="https://www.11st.co.kr/products/1522183727?srsltid=AfmBOop00C9hBt4wlKbrWq7zKPV6_QymAnHqnQx_0PwHUO15aXQhGmZu"
+            href="https://www.hyunhan.site"
             target="_blank"
             rel="noopener noreferrer"
         >
