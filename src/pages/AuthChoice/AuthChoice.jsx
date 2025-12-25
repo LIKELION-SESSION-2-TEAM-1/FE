@@ -7,14 +7,14 @@ import naver from '../../assets/oauth/네이버.png';
 import google from '../../assets/oauth/구글.png';
 import StartButton from '../../components/Landing/StartButton';
 import Snow from '../../components/Landing/Snow';
-import { API_BASE_URL } from '../../apis/api';
+import { MAIN_BASE_URL } from '../../apis/api';
 
 const AuthChoice = () => {
     const handleSocialLogin = (provider) => {
         // 로컬/배포 환경에 따라 돌아올 프론트 주소가 달라야 함
         // (백엔드가 redirect_uri 파라미터를 지원해야 동작)
         const redirectUri = `${window.location.origin}/home`;
-        window.location.href = `${API_BASE_URL}oauth2/authorization/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}`;
+        window.location.href = `${MAIN_BASE_URL}/oauth2/authorization/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}`;
     };
 
     return (
