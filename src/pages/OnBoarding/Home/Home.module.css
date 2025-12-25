@@ -2,14 +2,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh; 
+    min-height: 100vh;
 }
 
 .main__card {
     width: 350px;
     height: 322px;
     position: relative;
-    background-color: #FFF7D7 ;
+    background-color: #FFF7D7;
     border-radius: 30px;
     margin-top: 21px;
 }
@@ -48,7 +48,7 @@
     width: 312px;
     height: 47px;
     position: relative;
-    background-color: #FF3C01 ;
+    background-color: #FF3C01;
     border-radius: 30px;
     margin-top: 12px;
     margin-left: 21px;
@@ -111,7 +111,7 @@
     outline: none;
 }
 
-/* searchBar에서 엑스 색을 바꾸는 것임!!*/ 
+/* searchBar에서 엑스 색을 바꾸는 것임!!*/
 .searchBar input[type="search"]::-webkit-search-cancel-button {
     -webkit-appearance: searchfield-cancel-button;
     filter: grayscale(1) opacity(0.6);
@@ -129,7 +129,7 @@
     width: 175px;
     height: 198px;
     position: relative;
-    background-color:#007931 ;
+    background-color: #007931;
     border-radius: 30px;
     margin-top: 17px;
     cursor: pointer;
@@ -137,7 +137,7 @@
 
 .recco__text {
     font-size: 30px;
-    color:#FFF7D7;
+    color: #FFF7D7;
     margin-top: 32px;
     margin-left: 19px;
     font-weight: 700;
@@ -154,12 +154,12 @@
 .style {
     width: 175px;
     height: 97px;
-    background-color:#FF3C01;
+    background-color: #FF3C01;
     border-radius: 30px;
     display: flex;
     justify-content: space-between;
     margin-top: 17px;
-    position: relative; 
+    position: relative;
 }
 
 .style__text {
@@ -206,7 +206,7 @@
     position: absolute;
     top: 18px;
     right: 23px;
-    background-color:#FF3C01;
+    background-color: #FF3C01;
     border-radius: 30px;
     cursor: pointer;
 }
@@ -222,8 +222,118 @@
     font-size: 12px;
     font-weight: lighter;
     display: flex;
-    justify-content: center; 
-    align-items: center; 
+    justify-content: center;
+    align-items: center;
     text-align: center;
     padding-bottom: 134px;
+}
+
+/* Search Overlay Styles */
+.searchOverlay {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.searchHeader {
+    width: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.backButton_icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    cursor: pointer;
+    transform: rotate(180deg);
+    /* Assuming generic arrow is right-pointing */
+}
+
+.headerTitle {
+    font-size: 24px;
+    font-weight: 900;
+    color: #34220F;
+}
+
+/* Reusing .searchBar from main, but ensure it works here too */
+.searchBarFocused {
+    width: 350px;
+    height: 51px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    background-color: #FFF7D7;
+    position: relative;
+    /* margin-top managed by layout */
+    justify-content: flex-start;
+}
+
+.recentContainer {
+    width: 350px;
+    min-height: 400px;
+    background-color: #F8F8F8;
+    /* Light grey/white */
+    border-radius: 30px;
+    margin-top: 20px;
+    padding: 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.recentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.recentTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.recentActions {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+.actionButton {
+    cursor: pointer;
+}
+
+.msgDisabled {
+    margin-top: 50px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+.recentList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.recentItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    color: #333;
+}
+
+.deleteItemBtn {
+    cursor: pointer;
+    font-weight: bold;
+    color: #999;
+    margin-left: 10px;
 }

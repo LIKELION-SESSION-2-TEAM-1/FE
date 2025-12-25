@@ -1,7 +1,4 @@
-import { request } from "./api";
-
-// [추가] AI 기능 전용 Base URL 정의
-const AI_BASE_URL = "https://port-0-bemaster-mild533144fe3281.sel3.cloudtype.app/";
+import { searchApi } from "./api";
 
 /**
  * AI 키워드 분석 요청
@@ -11,13 +8,10 @@ export const fetchAiKeywords = async (chatRoomId) => {
         throw new Error("chatRoomId is required");
     }
 
-    let result = await request(`/api/ai/keywords/${chatRoomId}`, {
-        method: "POST",
-        body: { keywords: [] },
-        baseUrl: AI_BASE_URL, // [수정] AI 서버 주소로 요청
-    });
+    const response = await searchApi.post(`/api/ai/keywords/${chatRoomId}`, { keywords: [] });
+    let result = response.data;
 
-    // [방어 로직] 응답이 문자열인 경우 파싱 시도
+    // [방어 로직] 응답이 문자열인 경우 파싱 시도 (Axios may parse it, but if it's double string encoded)
     if (typeof result === "string") {
         try {
             result = JSON.parse(result);
@@ -44,8 +38,8 @@ export const fetchAiKeywords = async (chatRoomId) => {
 export const fetchAiPlan = async (keywords) => {
     const sanitizedKeywords = Array.isArray(keywords)
         ? keywords
-              .map((kw) => (kw === null || kw === undefined ? "" : String(kw).trim()))
-              .filter(Boolean)
+            .map((kw) => (kw === null || kw === undefined ? "" : String(kw).trim()))
+            .filter(Boolean)
         : [];
 
     if (!sanitizedKeywords.length) {
@@ -53,13 +47,10 @@ export const fetchAiPlan = async (keywords) => {
     }
 
     console.log("🚀 [AI Plan 요청] 키워드:", sanitizedKeywords);
-    console.log("🎯 [Target Server]:", AI_BASE_URL); // 요청 서버 확인용 로그
 
-    let result = await request("/api/ai/plan", {
-        method: "POST",
-        body: { keywords: sanitizedKeywords },
-        baseUrl: AI_BASE_URL, // [수정] AI 서버 주소로 요청
-    });
+    // searchApi has the Base URL configured
+    const response = await searchApi.post("/api/ai/plan", { keywords: sanitizedKeywords });
+    let result = response.data;
 
     // 1. 전체 응답이 문자열로 온 경우 파싱 (이중 JSON 인코딩 방지)
     if (typeof result === "string") {
