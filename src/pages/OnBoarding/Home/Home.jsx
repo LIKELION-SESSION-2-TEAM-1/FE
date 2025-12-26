@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate, createSearchParams } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 
 import pic from "../../../assets/pic/pic1.png";
@@ -20,7 +20,7 @@ import useAuthStore from '../../../stores/useAuthStore';
 
 const Home = () => {
     const navigate = useNavigate();
-    const [searchTerm, setSearchTerm] = useState('');
+
 
     // UI State
     const [isReccoExpanded, setIsReccoExpanded] = useState(false);
@@ -39,8 +39,8 @@ const Home = () => {
                 const { user, login, token } = useAuthStore.getState();
                 const realName = profile?.nickname || profile?.username || profile?.name;
 
-                if (realName && (user?.username === 'Social User' || !user?.username)) {
-                    console.log("Updating Social User to:", realName);
+                if (realName && user?.username !== realName) {
+                    console.log("Updating User Name to:", realName);
                     // If token is missing in store (rare), try localStorage or just pass null (login might need token)
                     const currentToken = token || localStorage.getItem('accessToken');
                     if (currentToken) {
@@ -98,7 +98,7 @@ const Home = () => {
                                 className={styles.searchBar__input}
                                 type="text"
                                 placeholder='여행지 검색하기'
-                                value={searchTerm}
+
                                 readOnly
                             // Prevent typing in this view, force mode switch
                             />
