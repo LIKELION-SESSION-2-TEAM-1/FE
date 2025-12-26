@@ -1,17 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import styles from './ChatList.module.css';
 import roomImg from '../../../assets/pic/chatlist_pic.png'; // Fallback image or default
 import searchIcon from '../../../assets/pic/search.svg';
 import { useNavigate } from 'react-router-dom';
 import { getChatRooms } from '../../../apis/chatApi';
+import useDataStore from '../../../stores/useDataStore';
 
 const ParticipatingChats = () => {
     const navigate = useNavigate();
-    const [chatRooms, setChatRooms] = useState([]);
+    const { chatRooms, chatRoomsLastFetched, setChatRooms } = useDataStore();
 
     useEffect(() => {
         const fetchRooms = async () => {
+            // Cache valid for 3 minutes (Chat rooms might update more often than rankings)
+            const CACHE_DURATION = 3 * 60 * 1000;
+            const isCacheValid = chatRooms && chatRoomsLastFetched && (Date.now() - chatRoomsLastFetched < CACHE_DURATION);
+
+            if (isCacheValid) {
+                console.log("Using cached chat rooms");
+                return;
+            }
+
             try {
+                console.log("Fetching new chat rooms...");
                 const data = await getChatRooms();
                 // 백엔드 응답이 배열인지 확인
                 if (Array.isArray(data)) {
@@ -25,7 +36,9 @@ const ParticipatingChats = () => {
         };
 
         fetchRooms();
-    }, []);
+    }, [chatRooms, chatRoomsLastFetched, setChatRooms]);
+
+    const activeChatRooms = chatRooms || [];
 
     const handleRoomClick = (roomId) => {
         // 채팅방 상세 페이지로 이동 (ID 전달)
@@ -40,7 +53,7 @@ const ParticipatingChats = () => {
                 <img className={styles.searchIcon} src={searchIcon} alt="검색" />
             </div>
 
-            {chatRooms.length === 0 ? (
+            {activeChatRooms.length === 0 ? (
                 // <p className={styles.noRooms}>참여 중인 채팅방이 없습니다.</p>
                 // 예시로 기존 정적 데이터 하나를 보여줄지, 아니면 비어있음을 보여줄지 결정.
                 // 현재는 기존 UI 유지를 위해, 데이터가 없을 때만 하드코딩 된 예시를 잠시 보여주거나,
@@ -50,7 +63,7 @@ const ParticipatingChats = () => {
                     참여 중인 채팅방이 없습니다.
                 </div>
             ) : (
-                chatRooms.map((room) => (
+                activeChatRooms.map((room) => (
                     <div
                         key={room.roomId || room.room_id || Math.random()} // Unique key fallback
                         className={styles.roomCard}

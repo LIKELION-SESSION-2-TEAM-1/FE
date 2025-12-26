@@ -1,4 +1,4 @@
-import api, { searchApi } from "./api";
+import api from "./api";
 import Aromanize from "aromanize";
 
 /**
@@ -97,5 +97,15 @@ export const getFavorites = async () => {
  */
 export const deleteFavorite = async (favoriteId) => {
     const response = await api.delete(`/api/favorites/${favoriteId}`);
+    return response.data;
+};
+
+/**
+ * 주간 인기 여행지 랭킹 조회
+ * @returns {Promise<Array>} 랭킹 데이터 배열
+ */
+export const getWeeklyRanking = async () => {
+    // 유저 제보: 랭킹 API도 Main 서버(beeee...)에 있음
+    const response = await api.get("/api/ranking/weekly");
     return response.data;
 };
