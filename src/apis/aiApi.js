@@ -1,4 +1,4 @@
-import { searchApi } from "./api";
+import api, { searchApi } from "./api";
 
 /**
  * AI 키워드 분석 요청
@@ -103,4 +103,27 @@ export const fetchAiPlan = async (keywords) => {
         description: description,
         schedule: finalSchedule,
     };
+};
+
+/**
+ * AI 여자친구(여름이) 채팅 요청
+ * URL: /api/girlfriend/chat
+ * Method: POST
+ */
+export const sendAiGirlfriendMessage = async (userMessage) => {
+    if (!userMessage || !userMessage.trim()) {
+        throw new Error("메시지 내용이 없습니다.");
+    }
+
+    try {
+        // [변경] searchApi -> api (메인 서버) 로 변경
+        // /api/girlfriend/chat 경로는 메인 서버에 위치할 가능성이 높음 (/ai prefix 삭제짐)
+        const response = await api.post("/api/girlfriend/chat", {
+            userMessage: userMessage
+        });
+        return response.data; // { reply: "..." }
+    } catch (error) {
+        console.error("AI Girlfriend Chat Error:", error);
+        throw error;
+    }
 };

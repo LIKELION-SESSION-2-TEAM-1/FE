@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.a91dcb59.css",
-    "main.js": "/static/js/main.51ca4379.js",
+    "main.css": "/static/css/main.d454b22d.css",
+    "main.js": "/static/js/main.2418f424.js",
     "static/media/sinan_salt.png": "/static/media/sinan_salt.398c89adb498cb2c03e6.png",
     "static/media/체험엑티비티.png": "/static/media/체험엑티비티.d36ac355b775de9d40be.png",
     "static/media/관광보단먹방.png": "/static/media/관광보단먹방.3c1644d016f4fc5b6698.png",
@@ -31,11 +31,11 @@
     "static/media/arrow4.svg": "/static/media/arrow4.9c96816ba1f54f92dd4d25abaaa5cd20.svg",
     "static/media/arrow5.svg": "/static/media/arrow5.d78274682478e91e7543d798d1108443.svg",
     "static/media/menu.svg": "/static/media/menu.93e246810f5e2ed7cc697583986b0496.svg",
-    "main.a91dcb59.css.map": "/static/css/main.a91dcb59.css.map",
-    "main.51ca4379.js.map": "/static/js/main.51ca4379.js.map"
+    "main.d454b22d.css.map": "/static/css/main.d454b22d.css.map",
+    "main.2418f424.js.map": "/static/js/main.2418f424.js.map"
   },
   "entrypoints": [
-    "static/css/main.a91dcb59.css",
-    "static/js/main.51ca4379.js"
+    "static/css/main.d454b22d.css",
+    "static/js/main.2418f424.js"
   ]
 }
