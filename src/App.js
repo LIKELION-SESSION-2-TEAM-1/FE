@@ -11,6 +11,7 @@ import Home from './pages/OnBoarding/Home/Home';
 import ChatList from './pages/Chatting/ChatList/ChatList';
 import ChatRoom from './pages/Chatting/ChatRoom/ChatRoom';
 import ChatJoinPage from './pages/Chatting/ChatJoin/ChatJoinPage';
+import AiChat from './pages/Chatting/AiChat/AiChat';
 
 import AuthChoice from './pages/AuthChoice/AuthChoice';
 import Signup from './pages/Signup/Signup';
@@ -52,8 +53,8 @@ function App() {
         }
     }, [search, hash, pathname, navigate]);
     // Merge hideHeader conditions: chatlist, chatroom, landing(/), start page, login page, dogeja page, mypage, edit-style
-    const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/' || pathname === '/start' || pathname === '/dogeja' || pathname === '/mypage' || pathname === '/mypage/edit-style';
-    const isChatRoom = pathname === '/chatroom';
+    const hideHeader = pathname === '/chatlist' || pathname === '/chatroom' || pathname === '/ai-chat' || pathname === '/' || pathname === '/start' || pathname === '/dogeja' || pathname === '/mypage' || pathname === '/mypage/edit-style';
+    const isChatRoom = pathname === '/chatroom' || pathname === '/ai-chat';
 
     // Merge hideNav conditions: dogeja page, landing(/), start, login, signup, mypage, edit-style
     // Note: Incoming changed hideNav logic to use variable. We will combine them.
@@ -71,6 +72,7 @@ function App() {
                         <Route path="/chatlist" element={<ChatList />} />
                         <Route path="/chatroom" element={<ChatRoom />} />
                         <Route path="/chat/join" element={<ChatJoinPage />} />
+                        <Route path="/ai-chat" element={<AiChat />} />
 
                         {/* Auth Routes */}
                         <Route path="/start" element={<AuthChoice />} />

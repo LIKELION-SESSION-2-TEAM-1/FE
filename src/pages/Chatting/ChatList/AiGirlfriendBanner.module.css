@@ -1,0 +1,78 @@
+.bannerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #FF9A9E 0%, #ffc3a0 100%);
+    border-radius: 12px;
+    /* Less rounded for a banner feel */
+    padding: 16px 20px;
+    /* Reduced vertical padding */
+    margin: 20px 20px 10px 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(255, 105, 135, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+    position: relative;
+    min-height: 80px;
+    /* Force it to be a bit slimmer */
+}
+
+.bannerContainer:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 105, 135, 0.3);
+}
+
+.textContainer {
+    flex: 1;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.adBadge {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    width: fit-content;
+    font-weight: 700;
+}
+
+.title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 4px 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.4;
+    font-weight: 500;
+    margin: 0;
+}
+
+.image {
+    width: 70px;
+    /* Smaller image */
+    height: 70px;
+    object-fit: cover;
+    /* Cover usually looks better for circles/squares */
+    border-radius: 50%;
+    /* Make it a circle like a profile or ad icon */
+    margin-left: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: transform 0.3s ease;
+}
+
+.bannerContainer:hover .image {
+    transform: scale(1.05) rotate(3deg);
+}
