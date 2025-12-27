@@ -79,6 +79,7 @@
     border: 1px solid #f0e6d6;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
 }
 
 .resultCard:hover {
@@ -164,7 +165,7 @@
 
 .favoriteButton {
     position: absolute;
-    top: 12px;
+    bottom: 12px;
     right: 12px;
     width: 28px;
     height: 28px;
