@@ -6,6 +6,7 @@ import sendIcon from "../../../assets/pic/send.svg";
 import gfImage from '../../../assets/pic/여친/여친2.png';
 import { sendAiGirlfriendMessage } from '../../../apis/aiApi';
 import { getProfile } from '../../../apis/api';
+import BouncingBalls from '../../../components/Effects/BouncingBalls';
 
 const AI_NAMES = ['지수', '서연', '하린', '민지', '유민', '지우', '예은', '다인', '유진', '채원'];
 
@@ -110,10 +111,21 @@ const AiChat = () => {
         }
     };
 
+    const bouncingColors = React.useMemo(() => [
+        "rgba(255, 10, 50, 0.5)",
+        "rgba(10, 255, 50, 0.5)",
+        "rgba(10, 50, 255, 0.5)",
+        "rgba(0, 0, 0, 0.5)"
+    ], []);
+
     return (
         <div className={styles.screen}>
+            <BouncingBalls
+                count={20}
+                colors={bouncingColors}
+            />
             {/* Header */}
-            <header className={styles.topBar}>
+            <header className={styles.topBar} style={{ position: 'relative', zIndex: 10 }}>
                 <button className={styles.navBtn} onClick={() => navigate(-1)} aria-label="back">
                     <img src={backIcon} alt="back" />
                 </button>
@@ -124,7 +136,7 @@ const AiChat = () => {
             </header>
 
             {/* Messages */}
-            <div className={styles.messageList}>
+            <div className={styles.messageList} style={{ position: 'relative', zIndex: 1, background: 'transparent' }}>
                 {messages.map((msg) => (
                     <div key={msg.id} className={`${styles.messageRow} ${msg.isMe ? styles.myRow : styles.otherRow}`}>
                         {!msg.isMe && (
@@ -150,7 +162,7 @@ const AiChat = () => {
             </div>
 
             {/* Input */}
-            <div className={styles.inputBar}>
+            <div className={styles.inputBar} style={{ position: 'relative', zIndex: 10 }}>
                 <input
                     className={styles.input}
                     value={inputText}

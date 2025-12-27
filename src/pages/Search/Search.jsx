@@ -207,7 +207,7 @@ const Search = () => {
                                         <path
                                             d="M16.1 1.9C14.1 -0.1 11.1 -0.1 9.1 1.9L9 2L8.9 1.9C6.9 -0.1 3.9 -0.1 1.9 1.9C-0.6 4.4 -0.6 8.4 1.9 10.9L9 16L16.1 10.9C18.6 8.4 18.6 4.4 16.1 1.9Z"
                                             fill={isFav ? "#FF3C01" : "none"}
-                                            stroke={isFav ? "#FF3C01" : "#FF3C01"}
+                                            stroke={isFav ? "#FF3C01" : "#DBDBDB"}
                                             strokeWidth="2"
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
