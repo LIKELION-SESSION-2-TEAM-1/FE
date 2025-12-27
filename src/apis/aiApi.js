@@ -8,7 +8,8 @@ export const fetchAiKeywords = async (chatRoomId) => {
         throw new Error("chatRoomId is required");
     }
 
-    const response = await searchApi.post(`/api/ai/keywords/${chatRoomId}`, { keywords: [] });
+    // [변경] searchApi -> api (메인 서버)
+    const response = await api.post(`/api/ai/keywords/${chatRoomId}`, { keywords: [] });
     let result = response.data;
 
     // [방어 로직] 응답이 문자열인 경우 파싱 시도 (Axios may parse it, but if it's double string encoded)
@@ -48,8 +49,8 @@ export const fetchAiPlan = async (keywords) => {
 
     console.log("🚀 [AI Plan 요청] 키워드:", sanitizedKeywords);
 
-    // searchApi has the Base URL configured
-    const response = await searchApi.post("/api/ai/plan", { keywords: sanitizedKeywords });
+    // [변경] searchApi -> api (메인 서버)
+    const response = await api.post("/api/ai/plan", { keywords: sanitizedKeywords });
     let result = response.data;
 
     // 1. 전체 응답이 문자열로 온 경우 파싱 (이중 JSON 인코딩 방지)
