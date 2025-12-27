@@ -50,7 +50,13 @@ const ParticipatingChats = () => {
         <div className={styles.participatingContainer}>
             <div className={styles.sectionHeader}>
                 <span className={styles.sectionTitle}>참여중인 여행톡</span>
-                <img className={styles.searchIcon} src={searchIcon} alt="검색" />
+                <img
+                    className={styles.searchIcon}
+                    src={searchIcon}
+                    alt="검색"
+                    onClick={() => navigate('/search')}
+                    style={{ cursor: 'pointer' }}
+                />
             </div>
 
             {activeChatRooms.length === 0 ? (
