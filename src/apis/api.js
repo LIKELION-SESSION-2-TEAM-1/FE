@@ -3,7 +3,7 @@ import { getAccessToken } from '../utils/authToken';
 
 // --- Base URL Configuration ---
 export const MAIN_BASE_URL = "https://port-0-beeee-mjfnlzve18281716.sel3.cloudtype.app";
-export const SEARCH_BASE_URL = "https://port-0-bemaster-mild533144fe3281.sel3.cloudtype.app";
+export const SEARCH_BASE_URL = "https://port-0-beeee-mjfnlzve18281716.sel3.cloudtype.app";
 
 // --- Axios Instance Creator to share interceptor logic ---
 const createAxiosInstance = (baseUrl) => {
