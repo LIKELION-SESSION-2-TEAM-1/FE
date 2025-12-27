@@ -12,6 +12,7 @@ import ChatList from './pages/Chatting/ChatList/ChatList';
 import ChatRoom from './pages/Chatting/ChatRoom/ChatRoom';
 import ChatJoinPage from './pages/Chatting/ChatJoin/ChatJoinPage';
 import AiChat from './pages/Chatting/AiChat/AiChat';
+import Trip from './pages/Trip/Trip';
 
 import AuthChoice from './pages/AuthChoice/AuthChoice';
 import Signup from './pages/Signup/Signup';
@@ -25,6 +26,7 @@ import TripStyleEdit from './pages/MyPage/TripStyleEdit';
 function App() {
     const { pathname, search, hash } = useLocation();
     const navigate = useNavigate();
+    // Trigger HMR
 
     // Global OAuth Token Handling
     useEffect(() => {
@@ -73,6 +75,8 @@ function App() {
                         <Route path="/chatroom" element={<ChatRoom />} />
                         <Route path="/chat/join" element={<ChatJoinPage />} />
                         <Route path="/ai-chat" element={<AiChat />} />
+
+                        <Route path="/trip" element={<Trip />} />
 
                         {/* Auth Routes */}
                         <Route path="/start" element={<AuthChoice />} />
