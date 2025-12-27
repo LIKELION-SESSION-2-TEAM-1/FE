@@ -17,7 +17,7 @@
     width: 334px;
     height: 75px;
     box-sizing: border-box;
-    
+
     background-color: #FFF7D7;
     border-radius: 50px;
 
@@ -37,7 +37,7 @@
     height: 60px;
     background-color: transparent;
     border-radius: 20px;
-    
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -50,10 +50,10 @@
     height: 24px;
     background-color: #111111;
 
-    mask-size: contain; 
+    mask-size: contain;
     mask-position: center;
     mask-repeat: no-repeat;
-    
+
     -webkit-mask-size: contain;
     -webkit-mask-position: center;
     -webkit-mask-repeat: no-repeat;
@@ -78,6 +78,11 @@
 .icon_box.active .icon_text {
     color: #FFF7D7;
 }
+
+/* Specific override if we want to be safe, but generic active should work. 
+   The user might strictly mean "Make the PAGE" shown in the screenshot. 
+   I'll proceed to check for the page existence first. 
+   For now I will NOT modify css yet until I confirm what "Trip Page" needs. */
 
 .wrapper.chatBackground {
     background-color: #ffffff;

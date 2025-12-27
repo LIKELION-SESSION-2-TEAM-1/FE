@@ -1,0 +1,246 @@
+/* Existing banner styles unchanged... */
+.container {
+    padding: 20px;
+    background-color: #A7D7D9;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    padding-bottom: 100px;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll from rotated cards */
+}
+
+/* Banner (LeadVault) */
+/* Keep existing .banner, .bannerText, etc. */
+.banner {
+    width: 100%;
+    max-width: 350px;
+    height: 80px;
+    background-color: #fff;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+    text-decoration: none;
+    /* In case it's a link */
+}
+
+.bannerText {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #333;
+}
+
+.bannerLogo {
+    font-size: 14px;
+    font-weight: 900;
+    color: #888;
+    margin-top: 5px;
+}
+
+.bannerImage {
+    height: 60px;
+    object-fit: contain;
+}
+
+/* Card Stack Container */
+.cardStackContainer {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    height: 450px;
+    /* Adjust height based on card content */
+    perspective: 1000px;
+    display: flex;
+    justify-content: center;
+    /* margin-top: 20px; */
+}
+
+/* Base Card Style */
+.stackCard {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #FFF8D6;
+    border-radius: 30px;
+    padding: 25px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s ease-in-out;
+    transform-origin: center bottom;
+    /* To enable 3D overlapping feeling */
+}
+
+/* Active (Front) Card */
+.stackCard[data-index="0"] {
+    z-index: 10;
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+}
+
+/* Second Card (Behind) */
+.stackCard[data-index="1"] {
+    z-index: 9;
+    transform: translateY(20px) scale(0.95) rotate(3deg);
+    opacity: 0.8;
+    filter: brightness(0.95);
+}
+
+/* Third Card (Further Behind) */
+.stackCard[data-index="2"] {
+    z-index: 8;
+    transform: translateY(35px) scale(0.9) rotate(-3deg);
+    opacity: 0.6;
+    filter: brightness(0.9);
+}
+
+/* Hidden Cards */
+.stackCard[data-index="hidden"] {
+    z-index: 1;
+    transform: translateY(50px) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Content Styling Inside Card */
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.tripTitle {
+    font-size: 24px;
+    font-weight: 800;
+    color: #333;
+    margin: 0 0 5px 0;
+}
+
+.tripDate {
+    font-size: 14px;
+    color: #555;
+    font-weight: 600;
+}
+
+.viewAllBtn {
+    font-size: 12px;
+    font-weight: 700;
+    color: #333;
+    cursor: pointer;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+}
+
+.statusText {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.statusHighlight {
+    color: #4A90E2;
+    font-weight: 700;
+}
+
+.tripImage {
+    width: 100%;
+    height: 180px;
+    border-radius: 20px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.enterBtn {
+    width: 100%;
+    background-color: #DC4E26;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+.enterBtn:active {
+    background-color: #bd3e1e;
+}
+
+/* Empty Card (reuses styles effectively) */
+.emptyCard {
+    width: 100%;
+    max-width: 320px;
+    background-color: #FFF8D6;
+    border-radius: 30px;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.emptyText {
+    font-size: 16px;
+    color: #8A817C;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    font-weight: 500;
+}
+
+.createBtn {
+    background-color: #DC4E26;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(220, 78, 38, 0.3);
+}
+
+/* Dots */
+.dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 30px;
+    z-index: 20;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #FFF;
+    opacity: 0.5;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.dot.active {
+    background-color: #FFF;
+    opacity: 1;
+    transform: scale(1.2);
+}
